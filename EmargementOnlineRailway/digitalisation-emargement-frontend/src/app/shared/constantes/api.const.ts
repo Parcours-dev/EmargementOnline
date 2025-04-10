@@ -1,9 +1,8 @@
 // src/app/shared/constantes/api.const.ts
+import { environment } from '../../../environments/environment';
 
-// ✅ Version constante (recommandée)
-export const API_BACKEND = 'http://localhost:3000/api'; // ou ton URL ngrok en prod
+export const API_BACKEND = environment.apiUrl;
 
-// ✅ Classe uniquement si tu veux instancier (pas nécessaire ici)
 export class ApiConstantes {
   readonly URL_EXPRESS = API_BACKEND;
   readonly LOGIN = 'login';
