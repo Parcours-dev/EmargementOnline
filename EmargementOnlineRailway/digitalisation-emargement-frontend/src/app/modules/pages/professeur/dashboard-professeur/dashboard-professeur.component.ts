@@ -21,7 +21,7 @@ export class DashBoardProfesseurComponent implements OnInit {
   coursEnCours: any | null = null;
   etudiantsCours: any[] = [];
 
-  private readonly BASE_URL = "http://localhost:3000/api";
+  private readonly BASE_URL = "https://emargementonline-production.up.railway.app/api";
   private http = inject(HttpClient);
 
   ngOnInit(): void {

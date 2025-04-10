@@ -49,7 +49,7 @@ export class UbtWalletWidgetComponent implements OnInit {
 
       // 🔍 Récupération de l'utilisateur connecté
       const user = await this.http
-        .get<any>('http://localhost:3000/api/etudiants/me', { headers })
+        .get<any>('https://emargementonline-production.up.railway.app/api/etudiants/me', { headers })
         .toPromise();
 
       this.adresseEth = user.adresse_eth;

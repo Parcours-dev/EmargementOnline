@@ -13,7 +13,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   styleUrls: ['./dashboard-cfa.component.css']
 })
 export class DashBoardCfaComponent implements OnInit {
-  private readonly API = 'http://localhost:3000/api';
+  private readonly API = 'https://emargementonline-production.up.railway.app/api';
   private http = inject(HttpClient);
 
   activePanel: 'promotions' | 'groupes' | 'etudiants' | null = null;
