@@ -1,0 +1,10 @@
+{
+  "routes": {
+    "/accueil": {},
+    "/dashboard-cfa": {},
+    "/dashboard-etudiant": {},
+    "/dashboard-professeur": {},
+    "/generation-qr": {},
+    "/rapport-absence": {}
+  }
+}
