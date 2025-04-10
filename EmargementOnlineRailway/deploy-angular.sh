@@ -18,38 +18,34 @@ cd digitalisation-emargement-frontend || { echo -e "${RED}❌ Dossier frontend i
 
 ng build --configuration production || { echo -e "${RED}❌ Échec du build Angular${NC}"; exit 1; }
 
-# Vérifie que le dossier dist existe
-BUILD_DIR="./dist/digitalisation-emargement-frontend"
-if [ ! -d "$BUILD_DIR" ]; then
-  echo -e "${RED}❌ Dossier de build introuvable. Vérifie ton fichier angular.json.${NC}"
+# Vérifie que le dossier de build existe
+BUILD_DIR="./public/digitalisation-emargement-frontend/browser"
+if [ ! -f "$BUILD_DIR/index.html" ]; then
+  echo -e "${RED}❌ index.html introuvable dans le build. Vérifie ton angular.json et le build.${NC}"
   exit 1
 fi
 
 # Étape 2 : Nettoyage backend
 echo -e "${GREEN}🧹 2. Nettoyage de l'ancien build dans le backend...${NC}"
 cd ../digitalisation-emargement-backend || exit 1
-TARGET_DIR="./public/digitalisation-emargement-frontend"
+TARGET_DIR="./public/digitalisation-emargement-frontend/browser"
 rm -rf "$TARGET_DIR"
 mkdir -p "$TARGET_DIR"
 
-# Étape 3 : Copie
-echo -e "${GREEN}📂 3. Copie du nouveau build Angular dans Express...${NC}"
-cp -r ../digitalisation-emargement-frontend/dist/digitalisation-emargement-frontend/* "$TARGET_DIR"
-
-# Copie aussi le fichier index.csr.html et le renommer index.html dans le backend
-cp ../digitalisation-emargement-frontend/dist/digitalisation-emargement-frontend/browser/index.csr.html "$TARGET_DIR/index.html"
+# Étape 3 : Copie du nouveau build Angular vers le backend
+echo -e "${GREEN}📂 3. Copie du build dans Express...${NC}"
+cp -r ../digitalisation-emargement-frontend/public/digitalisation-emargement-frontend/browser/* "$TARGET_DIR"
 
 # Étape 4 : Vérification post-copie
 if [ ! -f "$TARGET_DIR/index.html" ]; then
-  echo -e "${RED}❌ index.html (ou index.csr.html) manquant après la copie. Vérifie que le build a bien généré les fichiers.${NC}"
+  echo -e "${RED}❌ index.html manquant après la copie. Problème pendant le transfert.${NC}"
   exit 1
 fi
 
-echo -e "${GREEN}📂 Fichier index.html copié avec succès dans le dossier backend !${NC}"
+echo -e "${GREEN}✅ index.html copié avec succès dans le backend !${NC}"
 
 # Étape 5 : Test manuel
-echo -e "${GREEN}🚀 5. Test manuel du fichier index.html dans Express...${NC}"
-echo "Accédez à votre serveur via l'URL suivante pour vérifier :"
-echo "http://localhost:3000"  # Si le serveur Express est local, sinon remplace par l'URL de production
+echo -e "${GREEN}🚀 5. Test manuel : Lance ton serveur Express et accède à :${NC}"
+echo "http://localhost:3000"  # Ou l'URL Railway
 
-echo -e "${GREEN}🎉 Déploiement terminé sans commit ! Tu peux tester et valider dans Express.${NC}"
+echo -e "${GREEN}🎉 Déploiement terminé ! Tu peux maintenant tester ton front servi par Express.${NC}"
