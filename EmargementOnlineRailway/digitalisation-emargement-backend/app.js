@@ -18,8 +18,9 @@ app.use(cors({
 
 app.use(express.json());
 
-// 🧾 Sert les fichiers statiques Angular compilés
-app.use(express.static(path.join(__dirname, "public")));
+// 📦 Sert le build Angular depuis le bon dossier
+const angularBuildPath = path.join(__dirname, "public", "digitalisation-emargement-frontend", "browser");
+app.use(express.static(angularBuildPath));
 
 // 🧩 Import des routes
 const authRoutes = require("./routes/auth.routes");
@@ -30,7 +31,6 @@ const presencesRoutes = require("./routes/presence.routes");
 const etudiantRoutes = require("./routes/etudiant.routes");
 const exportRoutes = require("./routes/export.routes");
 
-// 🧩 Utilisation des routes API
 app.use("/api", authRoutes);
 app.use("/api", enseignantRoutes);
 app.use("/api", cfaRoutes);
@@ -43,9 +43,9 @@ app.use("/api", require("./routes/ubtoken.routes"));
 // 🧾 Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// 🎯 Fallback pour les routes Angular (très important pour Angular Router)
+// 🎯 Fallback Angular (pour Angular Router)
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(angularBuildPath, 'index.html'));
 });
 
 // 🎧 Lancement serveur
