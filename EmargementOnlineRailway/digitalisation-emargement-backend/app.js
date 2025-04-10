@@ -8,6 +8,7 @@ const swaggerSpec = require('./config/swaggerConfig');
 const app = express();
 dotenv.config();
 
+// 🌍 Autoriser les origines front en dev + prod
 const allowedOrigins = [
     "http://localhost:4200",
     "https://emargementonline-production.up.railway.app"
@@ -28,11 +29,11 @@ app.use(cors({
 
 app.use(express.json());
 
-// 📦 Build Angular
+// 📦 Sert les fichiers Angular
 const angularBuildPath = path.join(__dirname, "public", "digitalisation-emargement-frontend", "browser");
 app.use(express.static(angularBuildPath));
 
-// 🧩 API routes
+// 📡 Routes API
 const authRoutes = require("./routes/auth.routes");
 const enseignantRoutes = require("./routes/professeur.routes");
 const cfaRoutes = require("./routes/cfa.routes");
@@ -40,6 +41,7 @@ const qrcodeRoutes = require("./routes/qrcode.routes");
 const presencesRoutes = require("./routes/presence.routes");
 const etudiantRoutes = require("./routes/etudiant.routes");
 const exportRoutes = require("./routes/export.routes");
+const ubtokenRoutes = require("./routes/ubtoken.routes");
 
 app.use("/api", authRoutes);
 app.use("/api", enseignantRoutes);
@@ -48,22 +50,21 @@ app.use("/api", qrcodeRoutes);
 app.use("/api", etudiantRoutes);
 app.use("/api/presences", presencesRoutes);
 app.use("/api/cfa", exportRoutes);
-app.use("/api", require("./routes/ubtoken.routes"));
+app.use("/api", ubtokenRoutes);
 
-// 🧾 Swagger
+// 📄 Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// 🎯 Route racine → page accueil Angular
-app.get('/', (req, res) => {
-    res.sendFile(path.join(angularBuildPath, 'accueil', 'index.html'));
-});
+// 📦 Serve Angular files from build (index.html dans 'accueil')
+const accueilPath = path.join(__dirname, 'public', 'digitalisation-emargement-frontend', 'accueil');
+app.use(express.static(accueilPath));
 
-// 🎯 Fallback Angular Router (ex: /dashboard-cfa)
+// 🎯 Fallback Angular Router (redirige toutes les autres requêtes vers index.html)
 app.get('*', (req, res) => {
-    res.sendFile(path.join(angularBuildPath, 'accueil', 'index.html'));
+    res.sendFile(path.join(accueilPath, 'index.html')); // Si route non trouvée, renvoyer index.html
 });
 
-// 🎧 Lancement serveur
+// 🚀 Lancement serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Serveur actif sur http://localhost:${PORT}`);
