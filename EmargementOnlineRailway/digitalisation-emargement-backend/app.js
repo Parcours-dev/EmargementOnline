@@ -49,7 +49,7 @@ app.use(cors({
 app.use(express.json());
 
 // ✅ Sert les fichiers Angular compilés (CSR)
-const angularBuildPath = path.join(__dirname, "public", "digitalisation-emargement-frontend", "browser");
+const angularBuildPath = path.join(__dirname, "public", "digitalisation-emargement-frontend");
 app.use(express.static(angularBuildPath));
 
 // 📡 Routes API
