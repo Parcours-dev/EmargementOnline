@@ -4,13 +4,12 @@ const dotenv = require("dotenv");
 const path = require("path");
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swaggerConfig');
+const helmet = require("helmet");
 
 const app = express();
 dotenv.config();
 
-const helmet = require("helmet");
-
-// 🔓 Politique CSP permissive pour que le front Angular fonctionne
+// 🔐 CSP permissive pour Angular
 app.use(
     helmet.contentSecurityPolicy({
         useDefaults: true,
@@ -21,13 +20,12 @@ app.use(
             imgSrc: ["'self'", "data:", "https:"],
             connectSrc: ["'self'", "https:"],
             fontSrc: ["'self'", "https:", "data:"],
-            objectSrc: ["'none'"],
-            upgradeInsecureRequests: [],
-        },
+            objectSrc: ["'none'"]
+        }
     })
 );
 
-// 🌍 Autoriser les origines front en dev + prod
+// ✅ CORS
 const allowedOrigins = [
     "http://localhost:4200",
     "https://emargementonline-production.up.railway.app"
@@ -48,8 +46,8 @@ app.use(cors({
 
 app.use(express.json());
 
-// 📦 Sert les fichiers Angular
-const angularBuildPath = path.join(__dirname, "public", "digitalisation-emargement-frontend", "browser", "accueil");
+// ✅ Sert les fichiers Angular compilés (CSR)
+const angularBuildPath = path.join(__dirname, "public", "digitalisation-emargement-frontend", "browser");
 app.use(express.static(angularBuildPath));
 
 // 📡 Routes API
@@ -74,16 +72,12 @@ app.use("/api", ubtokenRoutes);
 // 📄 Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// 📦 Serve Angular files from build (index.html dans 'accueil')
-const accueilPath = path.join(__dirname, 'public', 'digitalisation-emargement-frontend', 'accueil');
-app.use(express.static(accueilPath));
-
-// 🎯 Fallback Angular Router (redirige toutes les autres requêtes vers index.html)
+// ✅ Fallback Angular router : redirige tout vers index.html
 app.get('*', (req, res) => {
-    res.sendFile(path.join(accueilPath, 'index.html')); // Si route non trouvée, renvoyer index.html
+    res.sendFile(path.join(angularBuildPath, 'index.html'));
 });
 
-// 🚀 Lancement serveur
+// 🚀 Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Serveur actif sur http://localhost:${PORT}`);
