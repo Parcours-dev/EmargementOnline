@@ -16,6 +16,7 @@ app.use(
         directives: {
             defaultSrc: ["'self'"],
             scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:"],
+            scriptSrcAttr: ["'unsafe-inline'"], // Pour avoir du css sinon bruh
             styleSrc: ["'self'", "'unsafe-inline'", "https:"],
             imgSrc: ["'self'", "data:", "https:"],
             connectSrc: ["'self'", "https:"],
@@ -25,11 +26,12 @@ app.use(
     })
 );
 
+
 // ✅ CORS
 const allowedOrigins = [
-    "http://localhost:4200",
     "https://emargementonline-production.up.railway.app"
 ];
+
 
 app.use(cors({
     origin: function (origin, callback) {
