@@ -8,11 +8,22 @@ const swaggerSpec = require('./config/swaggerConfig');
 const app = express();
 dotenv.config();
 
-// Middleware CORS
+const allowedOrigins = [
+    "http://localhost:4200",
+    "https://emargementonline-production.up.railway.app"
+];
+
 app.use(cors({
-    origin: "*", // À restreindre à ton domaine en prod
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
 }));
 
 app.use(express.json());
