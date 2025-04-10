@@ -19,7 +19,7 @@ app.use(cors({
 app.use(express.json());
 
 // 📦 Sert le build Angular depuis le bon dossier
-const angularBuildPath = path.join(__dirname, "public", "digitalisation-emargement-frontend", "browser");
+const angularBuildPath = path.join(__dirname, "public", "digitalisation-emargement-frontend", "browser", "accueil");
 app.use(express.static(angularBuildPath));
 
 // 🧩 Import des routes
