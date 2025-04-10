@@ -1,0 +1,21 @@
+<div class="wallet-widget" *ngIf="isClient">
+  <img [src]="tokenLogo" alt="UBToken" width="24" height="24" />
+  <div class="info">
+    <div class="adresse d-flex align-items-center justify-content-center gap-2">
+      <ng-container *ngIf="adresseEth; else notConnected">
+        {{ shortAdresse }}
+        <button class="btn btn-sm btn-light btn-copy" (click)="copierAdresse()" title="Copier">
+          📋
+        </button>
+        <span *ngIf="copied" class="text-success fw-semibold">Copié !</span>
+      </ng-container>
+      <ng-template #notConnected>
+        Non connecté
+      </ng-template>
+    </div>
+
+    <div class="solde" *ngIf="adresseEth">
+      {{ soldeUBT }} UBT
+    </div>
+  </div>
+</div>

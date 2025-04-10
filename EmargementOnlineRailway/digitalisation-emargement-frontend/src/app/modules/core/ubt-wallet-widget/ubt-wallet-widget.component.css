@@ -1,0 +1,53 @@
+.wallet-widget {
+  position: sticky;
+  top: 1rem;
+  right: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: bold;
+  background: linear-gradient(270deg, #ff007c, #7f00ff, #00c3ff, #00ff94, #ffff00, #ff8800, #ff007c);
+  background-size: 1400% 1400%;
+  animation: rainbowAnimation 10s ease infinite;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+  z-index: 1000;
+  text-align: center;
+  font-size: 0.9rem;
+  min-width: 170px;
+}
+
+@keyframes rainbowAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.wallet-widget img {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 0.5rem;
+}
+
+.wallet-widget .adresse {
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.wallet-widget .solde {
+  font-size: 1.1rem;
+  margin-top: 0.25rem;
+}
+
+.btn-copy {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.75rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background-color: white;
+  border: none;
+}
+
+.btn-copy:hover {
+  background-color: #eee;
+}

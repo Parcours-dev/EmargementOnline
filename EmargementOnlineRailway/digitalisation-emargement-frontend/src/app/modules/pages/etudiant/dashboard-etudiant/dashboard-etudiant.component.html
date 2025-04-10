@@ -1,0 +1,62 @@
+<app-header />
+
+<main class="grayed-background main-content py-4">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- 🕐 Colonne 1 : Cours du jour -->
+      <div class="col-lg-4 col-md-6">
+        <section class="cours-du-jour">
+          <h5>Cours du jour</h5>
+          <div *ngFor="let cours of coursDuJour" class="card mt-3 text-center" [ngClass]="getColorClasse(cours)">
+            <div class="card-body">
+              <h5 class="card-title">{{ cours.nom_cours }}</h5>
+              <p>{{ cours.date_heure_debut | date:'shortTime' }} - {{ cours.date_heure_fin | date:'shortTime' }}</p>
+              <p *ngIf="cours === coursEnCours && cours.present !== true" class="text-warning fw-bold">⏳ Cours en cours</p>
+              <p *ngIf="cours.present === true" class="text-success fw-bold">✅ Présent</p>
+              <p *ngIf="cours.present === false && cours !== coursEnCours" class="text-danger fw-bold">❌ Absent</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- 🧾 Colonne 2 : Historique -->
+      <div class="col-lg-5 col-md-6">
+        <section class="historique">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Historique de présence</h5>
+            <select class="form-select w-auto" [(ngModel)]="jourFiltre">
+              <option value="">-- Filtrer par jour --</option>
+              <option *ngFor="let bloc of historique" [value]="bloc.jour">{{ bloc.jour }}</option>
+            </select>
+          </div>
+
+          <div *ngFor="let bloc of historique" [hidden]="jourFiltre && jourFiltre !== bloc.jour">
+            <h6 class="text-capitalize fw-semibold">{{ bloc.jour }}</h6>
+            <ul class="list-group mb-3">
+              <li *ngFor="let cours of bloc.cours" class="list-group-item">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                  <div>
+                    <strong>{{ cours.nom_cours }}</strong> — <span class="text-muted">{{ cours.nom_groupe }}</span><br />
+                    <small class="text-muted">{{ cours.date_heure_debut | date:'shortTime' }} - {{ cours.date_heure_fin | date:'shortTime' }}</small>
+                  </div>
+                  <span [ngClass]="{ 'text-success': cours.present, 'text-danger': !cours.present }" class="mt-2 mt-md-0 fw-bold fs-5">
+                    {{ cours.present ? '✅ Présent' : '❌ Absent' }}
+                  </span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <!-- 🌈 Colonne 3 : UBToken Wallet -->
+      <div class="col-lg-3 col-12">
+        <app-ubt-wallet-widget />
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<app-footer />
