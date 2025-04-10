@@ -6,23 +6,22 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swaggerConfig');
 
 const app = express();
-
 dotenv.config();
 
 // Middleware CORS
 app.use(cors({
-    origin: "*", // En prod tu peux restreindre à ton domaine
+    origin: "*", // À restreindre à ton domaine en prod
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(express.json());
 
-// 📦 Sert le build Angular depuis le bon dossier
+// 📦 Build Angular
 const angularBuildPath = path.join(__dirname, "public", "digitalisation-emargement-frontend", "browser");
 app.use(express.static(angularBuildPath));
 
-// 🧩 Import des routes
+// 🧩 API routes
 const authRoutes = require("./routes/auth.routes");
 const enseignantRoutes = require("./routes/professeur.routes");
 const cfaRoutes = require("./routes/cfa.routes");
@@ -43,9 +42,14 @@ app.use("/api", require("./routes/ubtoken.routes"));
 // 🧾 Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// 🎯 Fallback Angular (pour Angular Router)
+// 🎯 Route racine → page accueil Angular
+app.get('/', (req, res) => {
+    res.sendFile(path.join(angularBuildPath, 'accueil', 'index.html'));
+});
+
+// 🎯 Fallback Angular Router (ex: /dashboard-cfa)
 app.get('*', (req, res) => {
-    res.sendFile(path.join(angularBuildPath, 'index.html'));
+    res.sendFile(path.join(angularBuildPath, 'accueil', 'index.html'));
 });
 
 // 🎧 Lancement serveur
