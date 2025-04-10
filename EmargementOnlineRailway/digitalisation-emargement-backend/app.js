@@ -8,6 +8,25 @@ const swaggerSpec = require('./config/swaggerConfig');
 const app = express();
 dotenv.config();
 
+const helmet = require("helmet");
+
+// 🔓 Politique CSP permissive pour que le front Angular fonctionne
+app.use(
+    helmet.contentSecurityPolicy({
+        useDefaults: true,
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https:"],
+            imgSrc: ["'self'", "data:", "https:"],
+            connectSrc: ["'self'", "https:"],
+            fontSrc: ["'self'", "https:", "data:"],
+            objectSrc: ["'none'"],
+            upgradeInsecureRequests: [],
+        },
+    })
+);
+
 // 🌍 Autoriser les origines front en dev + prod
 const allowedOrigins = [
     "http://localhost:4200",
