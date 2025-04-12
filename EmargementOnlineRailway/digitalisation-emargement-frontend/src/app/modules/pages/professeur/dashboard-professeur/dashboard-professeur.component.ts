@@ -137,7 +137,7 @@ export class DashBoardProfesseurComponent implements OnInit {
     const encodedId = encodeURIComponent(identifiant);
 
     window.open(
-      `http://localhost:4200/generation-qr?creneau_id=${encodedId}`,
+      `https://emargementonline-production.up.railway.app/generation-qr?creneau_id=${encodedId}`,
       "_blank",
       "width=420,height=500"
     );

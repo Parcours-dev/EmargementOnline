@@ -59,7 +59,7 @@ export class GenerationQrComponent implements OnInit, OnDestroy {
       .post<any>(`${this.BASE_URL}/creneaux/${this.creneauId}/generate-qr`, {}, { headers })
       .subscribe({
         next: (data) => {
-          const scanUrl = `http://localhost:5173/scan/${data.token}`;
+          const scanUrl = `https://emargementonline-production.up.railway.app/scan/${data.token}`;
           this.qrMessage = `QR actif → ${scanUrl}`;
           this.compteur = 90;
           this.dessinerQR(scanUrl);
