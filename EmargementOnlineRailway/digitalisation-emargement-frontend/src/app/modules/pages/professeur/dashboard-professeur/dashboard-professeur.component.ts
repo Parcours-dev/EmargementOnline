@@ -128,19 +128,31 @@ export class DashBoardProfesseurComponent implements OnInit {
     });
   }
 
-  lancerGenerationQr(cours: any) {
-    const idCours = cours.id_cours;
-    const idGroupe = cours.id_groupe;
-    const idProf = cours.id_professeur;
-    //const date = formatDate(cours.date_heure_debut, 'yyyy-MM-dd HH:mm:ss', 'fr-FR');
-    const date = new Date(cours.date_heure_debut).toISOString().slice(0, 19).replace('T', ' '); //Format UTC pour plaisir à Railway
-    const identifiant = `${idCours}-${idGroupe}-${idProf}-${date}`;
+  lancerGenerationQr(cours: {
+    id_cours: string;
+    id_groupe: string;
+    id_professeur: string;
+    date_heure_debut: string;
+  }): void {
+    // ✅ Extraction des données
+    const { id_cours, id_groupe, id_professeur, date_heure_debut } = cours;
+
+    // 🕓 Conversion en UTC ISO → format SQL "YYYY-MM-DD HH:mm:ss"
+    const dateUTC = new Date(date_heure_debut)
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " "); // Ex: "2025-04-12 06:00:00"
+
+    // 🔗 Construction de l'identifiant complet
+    const identifiant = `${id_cours}-${id_groupe}-${id_professeur}-${dateUTC}`;
     const encodedId = encodeURIComponent(identifiant);
 
+    // 🌐 Ouverture de la fenêtre vers le composant QR
     window.open(
       `https://emargementonline-production.up.railway.app/generation-qr?creneau_id=${encodedId}`,
       "_blank",
       "width=420,height=500"
     );
   }
+
 }
