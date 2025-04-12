@@ -52,7 +52,7 @@ export class ScanQrComponent implements OnInit {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${tokenParsed}`);
     const empreinteDevice = window.navigator.userAgent + '_' + window.navigator.platform;
 
-    this.http.patch<any>(`${this.BASE_URL}/scan/${token}`, { empreinte_device: empreinteDevice }, { headers })
+    this.http.post<any>(`${this.BASE_URL}/qrcode/${token}/scan`, { empreinte_device: empreinteDevice }, { headers })
       .subscribe({
         next: (res) => {
           this.message = res.message || '✅ Présence enregistrée !';
