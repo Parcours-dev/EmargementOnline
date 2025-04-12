@@ -50,19 +50,26 @@ export class AccueilComponent {
 
     this.serviceLogin.connecterUtilisateur(parametresLogin).subscribe({
       next: retourLogin => {
-        // ✅ On utilise localStorage pour être en cohérence avec le header
         localStorage.setItem('_TOKEN_UTILISATEUR', JSON.stringify({ token: retourLogin.token }));
         localStorage.setItem('_INFOS_UTILISATEUR', JSON.stringify(retourLogin));
         this.gererCasSucces(retourLogin);
       },
       error: err => {
-        // ❌ Gère l’erreur de login ici (affichage message, redirection, etc.)
         console.error('Erreur de connexion :', err);
       },
     });
   }
 
   private gererCasSucces(retourLogin: RetourLogin) {
+    // ✅ Si l'étudiant venait d'un scan QR, on le redirige pour valider sa présence
+    const scanToken = localStorage.getItem('_SCAN_TOKEN');
+    if (scanToken) {
+      localStorage.removeItem('_SCAN_TOKEN');
+      this.router.navigateByUrl(`/scan/${scanToken}`);
+      return;
+    }
+
+    // Sinon, redirection classique par rôle
     if (retourLogin.role == this.ROLE_ETUDIANT) {
       this.router.navigateByUrl(`${DASHBOARD_ETUDIANT}`);
     }

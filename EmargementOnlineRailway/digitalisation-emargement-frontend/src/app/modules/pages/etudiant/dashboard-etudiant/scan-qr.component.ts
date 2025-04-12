@@ -28,14 +28,18 @@ export class ScanQrComponent implements OnInit {
     }
 
     const tokenStorage = localStorage.getItem('_TOKEN_UTILISATEUR');
-    if (!tokenStorage) {
+
+    // Si l'utilisateur vient juste d'être redirigé après login,
+    // il faut consommer le _SCAN_TOKEN une seule fois
+    if (tokenStorage) {
+      localStorage.removeItem('_SCAN_TOKEN'); // 👈 Nettoyage propre
+      this.enregistrerPresence(token);
+    } else {
       localStorage.setItem('_SCAN_TOKEN', token);
       this.router.navigate(['/login']);
-      return;
     }
-
-    this.enregistrerPresence(token);
   }
+
 
   enregistrerPresence(token: string): void {
     const userStorage = localStorage.getItem('_TOKEN_UTILISATEUR');
