@@ -132,7 +132,8 @@ export class DashBoardProfesseurComponent implements OnInit {
     const idCours = cours.id_cours;
     const idGroupe = cours.id_groupe;
     const idProf = cours.id_professeur;
-    const date = formatDate(cours.date_heure_debut, 'yyyy-MM-dd HH:mm:ss', 'fr-FR');
+    //const date = formatDate(cours.date_heure_debut, 'yyyy-MM-dd HH:mm:ss', 'fr-FR');
+    const date = new Date(cours.date_heure_debut).toISOString().slice(0, 19).replace('T', ' '); //Format UTC pour plaisir à Railway
     const identifiant = `${idCours}-${idGroupe}-${idProf}-${date}`;
     const encodedId = encodeURIComponent(identifiant);
 
