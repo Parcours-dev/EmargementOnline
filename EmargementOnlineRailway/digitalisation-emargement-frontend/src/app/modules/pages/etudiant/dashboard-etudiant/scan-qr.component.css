@@ -1,0 +1,25 @@
+.scan-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+.icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.success h2 {
+  color: green;
+}
+
+.error h2 {
+  color: red;
+}
+
+.loading h2 {
+  color: #555;
+}

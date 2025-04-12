@@ -45,7 +45,7 @@ const generateQrCode = async (req, res) => {
             message: "QR Code généré ✅",
             token,
             expires_in: 90,
-            scan_url: `http://localhost:5173/scan/${token}` // À adapter si besoin
+            scan_url: `https://emargementonline-production.up.railway.app/scan/${token}`
         });
 
     } catch (err) {

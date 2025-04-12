@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { Type } from '@angular/core';
 
-export const routes = [
+export const routes: Routes = [
   {
     path: '',
     redirectTo: 'accueil',
@@ -50,8 +50,15 @@ export const routes = [
       )
   },
   {
+    path: 'scan/:token',
+    loadComponent: () =>
+      import('./modules/pages/etudiant/dashboard-etudiant/scan-qr.component').then(
+        m => m.ScanQrComponent as Type<unknown>
+      )
+  },
+  {
     path: '**',
     redirectTo: 'accueil',
     pathMatch: 'full'
   }
-] as unknown as Routes;
+];
