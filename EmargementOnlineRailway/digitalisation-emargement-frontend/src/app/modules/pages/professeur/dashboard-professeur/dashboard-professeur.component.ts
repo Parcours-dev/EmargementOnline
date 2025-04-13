@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   inject
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
@@ -16,10 +17,11 @@ import { FooterComponent } from "../../../core/footer/footer.component";
   templateUrl: "./dashboard-professeur.component.html",
   styleUrls: ["./dashboard-professeur.component.css"]
 })
-export class DashBoardProfesseurComponent implements OnInit {
+export class DashBoardProfesseurComponent implements OnInit, OnDestroy {
   coursDuJour: any[] = [];
   coursEnCours: any | null = null;
   etudiantsCours: any[] = [];
+  intervalId: any;
 
   private readonly BASE_URL = "https://emargementonline-production.up.railway.app/api";
   private http = inject(HttpClient);
@@ -43,6 +45,19 @@ export class DashBoardProfesseurComponent implements OnInit {
     const headers = new HttpHeaders().set("Authorization", `Bearer ${parsed.token}`);
 
     this.chargerEmploiDuTemps(idProf, headers);
+
+    // ⏱️ Auto-refresh toutes les 10 secondes si un cours est en cours
+    this.intervalId = setInterval(() => {
+      if (this.coursEnCours) {
+        this.chargerEtudiantsCoursEnCours(headers);
+      }
+    }, 10000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   }
 
   decodeToken(token: string): any {
@@ -134,25 +149,15 @@ export class DashBoardProfesseurComponent implements OnInit {
     id_professeur: string;
     date_heure_debut: string;
   }): void {
-    // ✅ Extraction des données
     const { id_cours, id_groupe, id_professeur, date_heure_debut } = cours;
-
-    // 🕓 Conversion en UTC ISO → format SQL "YYYY-MM-DD HH:mm:ss"
-    const dateUTC = new Date(date_heure_debut)
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " "); // Ex: "2025-04-12 06:00:00"
-
-    // 🔗 Construction de l'identifiant complet
+    const dateUTC = new Date(date_heure_debut).toISOString().slice(0, 19).replace("T", " ");
     const identifiant = `${id_cours}-${id_groupe}-${id_professeur}-${dateUTC}`;
     const encodedId = encodeURIComponent(identifiant);
 
-    // 🌐 Ouverture de la fenêtre vers le composant QR
     window.open(
       `https://emargementonline-production.up.railway.app/generation-qr?creneau_id=${encodedId}`,
       "_blank",
       "width=420,height=500"
     );
   }
-
 }
