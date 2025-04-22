@@ -28,17 +28,19 @@ const generateQrCode = async (req, res) => {
             return res.status(404).json({ message: "Créneau introuvable." });
         }
 
-        // 🔐 Génère un token aléatoire unique et sécurisé
         const token = crypto.randomBytes(16).toString("hex");
-        const now = new Date();
-        const expiration = new Date(now.getTime() + 90 * 1000); // Valide 1min30
 
-        // 💾 Enregistre ce QR code en base
+        // Décale de +2h (UTC+2)
+        const now = new Date();
+        const nowPlus2h = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+        const expirationPlus2h = new Date(nowPlus2h.getTime() + 90 * 1000); // +90 secondes
+
         await db.query(
             `INSERT INTO qr_code (token, date_creation, date_expiration, id_cours, id_groupe, id_professeur, date_heure_debut)
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [token, now, expiration, id_cours, id_groupe, id_professeur, date_heure_debut]
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [token, nowPlus2h, expirationPlus2h, id_cours, id_groupe, id_professeur, date_heure_debut]
         );
+
 
         // ✅ Renvoie le token et l’URL de scan
         res.json({
