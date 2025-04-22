@@ -78,7 +78,7 @@
         tbody.innerHTML = "<tr><td colspan='7'>Chargement...</td></tr>";
 
         try {
-            const res = await fetch("http://localhost:3000/api/ubtoken/presences");
+            const res = await fetch("https://emargementonline-production.up.railway.app/api/ubtoken/presences");
             const data = await res.json();
 
             if (!Array.isArray(data)) throw new Error("Format inattendu");

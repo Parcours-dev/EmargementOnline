@@ -25,7 +25,7 @@ export class GenerationQrComponent implements OnInit, OnDestroy {
   intervalId: any = null;
   compteur: number = 90;
 
-  private readonly BASE_URL = 'http://localhost:3000/api';
+  private readonly BASE_URL = 'https://emargementonline-production.up.railway.app/api';
   private creneauId = '';
 
   constructor(private route: ActivatedRoute, private http: HttpClient) {}

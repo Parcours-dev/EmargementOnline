@@ -13,7 +13,7 @@ const swaggerDefinition = {
     },
     servers: [
         {
-            url: 'http://localhost:3000', // 💡 Adapter cette URL avec ton lien ngrok si besoin
+            url: 'https://emargementonline-production.up.railway.app/', // 💡 Adapter cette URL avec ton lien ngrok si besoin
             description: 'Serveur local'
         }
     ]

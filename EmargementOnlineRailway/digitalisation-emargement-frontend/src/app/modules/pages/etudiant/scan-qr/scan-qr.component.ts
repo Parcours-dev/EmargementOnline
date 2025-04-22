@@ -14,7 +14,7 @@ export class ScanQrComponent {
   tokenQr = '';
   message = '📷 Scan facial en cours...';
 
-  private readonly BASE_URL = 'http://localhost:3000/api';
+  private readonly BASE_URL = 'https://emargementonline-production.up.railway.app/api';
 
   constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) {
     this.tokenQr = this.route.snapshot.paramMap.get('token') || '';
