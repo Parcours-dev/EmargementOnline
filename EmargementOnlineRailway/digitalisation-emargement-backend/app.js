@@ -18,10 +18,11 @@ app.use(cors({
 // ✅ Middleware JSON
 app.use(express.json());
 
-// ✅ Fichiers statiques publics
-app.use(express.static(path.join(__dirname, "public")));
+// ✅ Justificatifs statiques (avant toutes routes dynamiques)
+app.use('/uploads/justificatifs', express.static(path.join(__dirname, 'uploads/justificatifs')));
+console.log('🛠️ Serving justificatifs from:', path.join(__dirname, 'uploads/justificatifs'));
 
-// ✅ ROUTES
+// ✅ ROUTES API
 const authRoutes = require("./routes/auth.routes");
 const enseignantRoutes = require("./routes/professeur.routes");
 const cfaRoutes = require("./routes/cfa.routes");
@@ -32,13 +33,12 @@ const exportRoutes = require("./routes/export.routes");
 const justificatifRoutes = require("./routes/justificatif.routes");
 const ubtokenRoutes = require("./routes/ubtoken.routes");
 
-// 📦 Toutes les routes montées sous /api
 app.use("/api", authRoutes);
 app.use("/api", enseignantRoutes);
 app.use("/api", cfaRoutes);
 app.use("/api", qrcodeRoutes);
 app.use("/api", etudiantRoutes);
-app.use("/api", justificatifRoutes); // ✅ DOIT précéder les autres si conflit de noms
+app.use("/api", justificatifRoutes); // ✅ Avant les autres pour éviter conflits
 app.use("/api/presences", presencesRoutes);
 app.use("/api/cfa", exportRoutes);
 app.use("/api", ubtokenRoutes);
@@ -46,26 +46,18 @@ app.use("/api", ubtokenRoutes);
 // ✅ Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ✅ Route de test racine
-app.get("/", (req, res) => {
-    res.send("✅ API d'émargement opérationnelle !");
-});
-
-// Consulation des justificatifs
-app.use('/uploads/justificatifs', express.static(path.join(__dirname, 'uploads/justificatifs')));
-console.log('🛠️ Serving justificatifs from:', path.join(__dirname, 'uploads/justificatifs'));
-
-
-// ✅ Fallback pour HTML
+// ============================
 // ✅ Servir le frontend Angular
+// ============================
 const frontendPath = path.join(__dirname, 'public/digitalisation-emargement-frontend');
-app.use('/', express.static(frontendPath));
 
-// ✅ Redirection fallback Angular (routes Angular côté client)
+// ✅ Fichiers Angular compilés
+app.use(express.static(frontendPath));
+
+// ✅ Fallback vers index.html pour Angular routing
 app.get('*', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
 });
-
 
 // ✅ Lancement serveur
 const PORT = process.env.PORT || 3000;
