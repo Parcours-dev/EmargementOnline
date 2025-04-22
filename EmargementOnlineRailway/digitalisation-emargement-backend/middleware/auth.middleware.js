@@ -16,10 +16,13 @@ const verifyToken = (req, res, next) => {
     console.log("🧾 [verifyToken] Token extrait :", token);
 
     try {
-        // ✅ Vérifie et décode le token avec la clé secrète de l'application
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log("✅ [verifyToken] Token valide. Payload :", decoded);
 
+        console.log("✅ [verifyToken] Token valide");
+        console.log("🧠 Payload complet :", decoded);
+        console.log("📅 Généré le :", new Date(decoded.iat * 1000).toLocaleString());
+        console.log("⌛ Expire le :", new Date(decoded.exp * 1000).toLocaleString());
+        console.log("🕓 Heure actuelle :", new Date().toLocaleString());
         // 💾 Injecte l'utilisateur dans req.user pour les middlewares ou contrôleurs suivants
         req.user = decoded;
 
