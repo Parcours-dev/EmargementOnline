@@ -24,7 +24,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "/"
               }
             ],
             "styles": [
@@ -58,12 +59,15 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "digitalisation-emargement-frontend:build"
+          },
           "configurations": {
             "production": {
-              "buildTarget": "digitalisation-emargement-frontend:build:production"
+              "browserTarget": "digitalisation-emargement-frontend:build:production"
             },
             "development": {
-              "buildTarget": "digitalisation-emargement-frontend:build:development"
+              "browserTarget": "digitalisation-emargement-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -83,7 +87,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "public",
+                "output": "/"
               }
             ],
             "styles": [

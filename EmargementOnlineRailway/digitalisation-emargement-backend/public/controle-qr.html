@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Contrôle Émargement</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 2rem; }
+        input, button, label { margin: 0.5rem 0; display: block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+        .present { color: green; font-weight: bold; }
+        .absent { color: red; font-weight: bold; }
+        #loginBox { margin-bottom: 2rem; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+<h1>🧑‍🏫 Suivi du cours en direct</h1>
+
+<div id="loginBox">
+    <h3>Connexion Professeur</h3>
+    <label>Email : <input type="email" id="email" /></label>
+    <label>Mot de passe : <input type="password" id="password" /></label>
+    <button onclick="login()">Se connecter</button>
+    <p id="loginMsg"></p>
+</div>
+
+<div id="mainContent" class="hidden">
+    <h3>📚 Filtrage du créneau</h3>
+    <label>Id Cours : <input id="id_cours" /></label>
+    <label>Id Groupe : <input id="id_groupe" /></label>
+    <label>Date/Heure début (YYYY-MM-DD HH:MM:SS) : <input id="date_heure" /></label>
+    <button onclick="chargerEtudiants()">Charger la liste</button>
+
+    <table id="etudiantsTable">
+        <thead>
+        <tr>
+            <th>Nom</th><th>Prénom</th><th>Email</th><th>Statut</th><th>Action</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+    const API = "http://localhost:3000";
+    let jwt = localStorage.getItem("jwt_prof") || null;
+    let intervalId = null;
+
+    async function login() {
+        const email = document.getElementById("email").value;
+        const mot_de_passe = document.getElementById("password").value;
+        const res = await fetch(`${API}/api/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, mot_de_passe })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.role === "professeur") {
+            jwt = data.token;
+            localStorage.setItem("jwt_prof", jwt);
+            document.getElementById("loginBox").classList.add("hidden");
+            document.getElementById("mainContent").classList.remove("hidden");
+        } else {
+            document.getElementById("loginMsg").textContent = "Connexion échouée ou rôle non autorisé.";
+        }
+    }
+
+    async function chargerEtudiants() {
+        const id_cours = document.getElementById("id_cours").value;
+        const id_groupe = document.getElementById("id_groupe").value;
+        const date_heure_debut = document.getElementById("date_heure").value;
+
+        const res = await fetch(`${API}/api/presences/controle?id_cours=${id_cours}&id_groupe=${id_groupe}&date_heure_debut=${encodeURIComponent(date_heure_debut)}`, {
+            headers: { Authorization: `Bearer ${jwt}` }
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            alert(data.message || "Erreur lors du chargement.");
+            return;
+        }
+
+        const tbody = document.querySelector("#etudiantsTable tbody");
+        tbody.innerHTML = "";
+
+        data.forEach(etudiant => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+        <td>${etudiant.nom}</td>
+        <td>${etudiant.prenom}</td>
+        <td>${etudiant.email}</td>
+        <td class="${etudiant.present ? "present" : "absent"}">
+          ${etudiant.present ? "Présent" : "Absent"}
+        </td>
+        <td>
+          ${!etudiant.present ? `<button onclick="valider('${etudiant.email}')">Valider</button>` : ""}
+        </td>
+      `;
+            tbody.appendChild(tr);
+        });
+
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(chargerEtudiants, 10000); // actualise toutes les 5s
+    }
+
+    async function valider(email) {
+        const id_cours = document.getElementById("id_cours").value;
+        const id_groupe = document.getElementById("id_groupe").value;
+        const date_heure_debut = document.getElementById("date_heure").value;
+
+        const res = await fetch(`${API}/api/presences/valider`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${jwt}`
+            },
+            body: JSON.stringify({ email, id_cours, id_groupe, date_heure_debut })
+        });
+
+        const data = await res.json();
+        alert(data.message || "Validation terminée.");
+        await chargerEtudiants(); // recharge
+    }
+
+    if (jwt) {
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("mainContent").classList.remove("hidden");
+    }
+</script>
+</body>
+</html>

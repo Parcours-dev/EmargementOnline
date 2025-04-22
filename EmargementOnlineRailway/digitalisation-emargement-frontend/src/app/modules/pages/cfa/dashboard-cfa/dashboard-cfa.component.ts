@@ -13,10 +13,10 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   styleUrls: ['./dashboard-cfa.component.css']
 })
 export class DashBoardCfaComponent implements OnInit {
-  private readonly API = 'https://emargementonline-production.up.railway.app/api';
+  private readonly API = 'http://localhost:3000/api';
   private http = inject(HttpClient);
 
-  activePanel: 'promotions' | 'groupes' | 'etudiants' | null = null;
+  activePanel: null | "promotions" | "groupes" | "etudiants" | "justificatifs" = null;
 
   // 🔹 Promotions
   promotions: any[] = [];
@@ -50,20 +50,33 @@ export class DashBoardCfaComponent implements OnInit {
     id_groupe_Anglais: ''
   };
 
+  // 🔸 Justificatifs
+  justificatifs: any[] = [];
+  filtreJustif: { [key: string]: string } = {
+    id_promotion: '',
+    id_etudiant: '',
+    statut: '',
+    date_min: '',
+    date_max: ''
+  };
+  headers: HttpHeaders | null = null;
+
+
   ngOnInit(): void {
     if (typeof window !== 'undefined') {
       const tokenStorage = localStorage.getItem('_TOKEN_UTILISATEUR');
       if (tokenStorage) {
         const token = JSON.parse(tokenStorage);
-        const headers = new HttpHeaders().set('Authorization', `Bearer ${token.token}`);
-        this.chargerPromotions(headers);
-        this.chargerGroupes(headers);
-        this.chargerEtudiants(headers);
+        this.headers = new HttpHeaders().set('Authorization', `Bearer ${token.token}`);
+        this.chargerPromotions(this.headers);
+        this.chargerGroupes(this.headers);
+        this.chargerEtudiants(this.headers);
+        this.chargerJustificatifs(this.headers); // chargement initial complet
       }
     }
   }
 
-  togglePanel(panel: 'promotions' | 'groupes' | 'etudiants') {
+  togglePanel(panel: 'promotions' | 'groupes' | 'etudiants' | 'justificatifs') {
     this.activePanel = this.activePanel === panel ? null : panel;
   }
 
@@ -81,42 +94,38 @@ export class DashBoardCfaComponent implements OnInit {
   }
 
   soumettreForm() {
-    if (typeof window !== 'undefined') {
-      const token = JSON.parse(localStorage.getItem('_TOKEN_UTILISATEUR')!);
-      const headers = new HttpHeaders()
-        .set('Authorization', `Bearer ${token.token}`)
-        .set('Content-Type', 'application/json');
+    const token = JSON.parse(localStorage.getItem('_TOKEN_UTILISATEUR')!);
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token.token}`)
+      .set('Content-Type', 'application/json');
 
-      const method = this.formPromo.id_promotion ? 'PUT' : 'POST';
-      const url = this.formPromo.id_promotion
-        ? `${this.API}/cfa/promotions/${this.formPromo.id_promotion}`
-        : `${this.API}/cfa/promotions`;
+    const method = this.formPromo.id_promotion ? 'PUT' : 'POST';
+    const url = this.formPromo.id_promotion
+      ? `${this.API}/cfa/promotions/${this.formPromo.id_promotion}`
+      : `${this.API}/cfa/promotions`;
 
-      this.http.request(method, url, {
-        body: this.formPromo,
-        headers
-      }).subscribe({
-        next: () => {
-          this.chargerPromotions(headers);
-          this.resetFormPromo();
-        },
-        error: () => console.error('❌ Erreur enregistrement promotion')
-      });
-    }
+    this.http.request(method, url, {
+      body: this.formPromo,
+      headers
+    }).subscribe({
+      next: () => {
+        this.chargerPromotions(headers);
+        this.resetFormPromo();
+      },
+      error: () => console.error('❌ Erreur enregistrement promotion')
+    });
   }
 
   supprimerPromotion(id: number) {
     if (!confirm('Supprimer cette promotion ?')) return;
 
-    if (typeof window !== 'undefined') {
-      const token = JSON.parse(localStorage.getItem('_TOKEN_UTILISATEUR')!);
-      const headers = new HttpHeaders().set('Authorization', `Bearer ${token.token}`);
+    const token = JSON.parse(localStorage.getItem('_TOKEN_UTILISATEUR')!);
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token.token}`);
 
-      this.http.delete(`${this.API}/cfa/promotions/${id}`, { headers }).subscribe({
-        next: () => this.chargerPromotions(headers),
-        error: () => console.error('❌ Erreur suppression promotion')
-      });
-    }
+    this.http.delete(`${this.API}/cfa/promotions/${id}`, { headers }).subscribe({
+      next: () => this.chargerPromotions(headers),
+      error: () => console.error('❌ Erreur suppression promotion')
+    });
   }
 
   resetFormPromo() {
@@ -138,46 +147,42 @@ export class DashBoardCfaComponent implements OnInit {
   }
 
   soumettreFormGroupe() {
-    if (typeof window !== 'undefined') {
-      const token = JSON.parse(localStorage.getItem('_TOKEN_UTILISATEUR')!);
-      const headers = new HttpHeaders()
-        .set('Authorization', `Bearer ${token.token}`)
-        .set('Content-Type', 'application/json');
+    const token = JSON.parse(localStorage.getItem('_TOKEN_UTILISATEUR')!);
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token.token}`)
+      .set('Content-Type', 'application/json');
 
-      const method = this.formGroupe.id_groupe ? 'PUT' : 'POST';
-      const url = this.formGroupe.id_groupe
-        ? `${this.API}/cfa/groupes/${this.formGroupe.id_groupe}`
-        : `${this.API}/cfa/groupes`;
+    const method = this.formGroupe.id_groupe ? 'PUT' : 'POST';
+    const url = this.formGroupe.id_groupe
+      ? `${this.API}/cfa/groupes/${this.formGroupe.id_groupe}`
+      : `${this.API}/cfa/groupes`;
 
-      this.http.request(method, url, {
-        body: {
-          nom: this.formGroupe.nom,
-          id_promotion: this.formGroupe.id_promotion
-        },
-        headers
-      }).subscribe({
-        next: () => {
-          this.chargerGroupes(headers);
-          this.resetFormGroupe();
-        },
-        error: () => console.error('❌ Erreur enregistrement groupe')
-      });
-    }
+    this.http.request(method, url, {
+      body: {
+        nom: this.formGroupe.nom,
+        id_promotion: this.formGroupe.id_promotion
+      },
+      headers
+    }).subscribe({
+      next: () => {
+        this.chargerGroupes(headers);
+        this.resetFormGroupe();
+      },
+      error: () => console.error('❌ Erreur enregistrement groupe')
+    });
   }
 
   supprimerGroupe(id: number) {
     const confirmation = confirm('Supprimer ce groupe ?');
     if (!confirmation) return;
 
-    if (typeof window !== 'undefined') {
-      const token = JSON.parse(localStorage.getItem('_TOKEN_UTILISATEUR')!);
-      const headers = new HttpHeaders().set('Authorization', `Bearer ${token.token}`);
+    const token = JSON.parse(localStorage.getItem('_TOKEN_UTILISATEUR')!);
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token.token}`);
 
-      this.http.delete(`${this.API}/cfa/groupes/${id}`, { headers }).subscribe({
-        next: () => this.chargerGroupes(headers),
-        error: () => console.error('❌ Erreur suppression groupe')
-      });
-    }
+    this.http.delete(`${this.API}/cfa/groupes/${id}`, { headers }).subscribe({
+      next: () => this.chargerGroupes(headers),
+      error: () => console.error('❌ Erreur suppression groupe')
+    });
   }
 
   resetFormGroupe() {
@@ -189,7 +194,6 @@ export class DashBoardCfaComponent implements OnInit {
     const promo = this.promotions.find((p: any) => p.id_promotion === id);
     return promo ? promo.nom : '?';
   }
-
 
   chargerEtudiants(headers: HttpHeaders) {
     this.http.get<any[]>(`${this.API}/cfa/etudiants`, { headers }).subscribe({
@@ -257,4 +261,50 @@ export class DashBoardCfaComponent implements OnInit {
     this.etudiantEnEdition = false;
   }
 
+  chargerJustificatifs(headers: HttpHeaders) {
+    const params: any = {};
+
+    for (const [key, value] of Object.entries(this.filtreJustif)) {
+      if (value) params[key] = value;
+    }
+
+    this.http.get<any[]>(`${this.API}/cfa/justificatifs`, { headers, params }).subscribe({
+      next: (data) => this.justificatifs = data,
+      error: () => console.error('❌ Erreur chargement justificatifs')
+    });
+  }
+
+  traiterJustificatif(justif: any, statut: 'accepte' | 'refuse') {
+    const token = JSON.parse(localStorage.getItem('_TOKEN_UTILISATEUR')!);
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${token.token}`)
+      .set('Content-Type', 'application/json');
+
+    this.http.patch(`${this.API}/cfa/justificatifs/${justif.id}`, {
+      statut,
+      commentaire_admin: justif.commentaire_admin
+    }, { headers }).subscribe({
+      next: () => this.chargerJustificatifs(headers),
+      error: () => console.error(`❌ Erreur traitement justificatif : ${justif.id}`)
+    });
+  }
+
+
+  chargerJustificatifsDepuisFiltres() {
+    const token = JSON.parse(localStorage.getItem('_TOKEN_UTILISATEUR')!);
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token.token}`);
+
+    const params: any = {};
+
+    for (const key in this.filtreJustif) {
+      if (this.filtreJustif[key]) {
+        params[key] = this.filtreJustif[key];
+      }
+    }
+
+    this.http.get<any[]>(`${this.API}/cfa/justificatifs`, { headers, params }).subscribe({
+      next: (data) => this.justificatifs = data,
+      error: () => console.error('❌ Erreur chargement justificatifs')
+    });
+  }
 }

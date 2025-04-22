@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Prof - Génération QR Code</title>
+  <style>
+    body { font-family: sans-serif; background: #f0f0f0; padding: 2rem; }
+    h1 { margin-bottom: 1rem; }
+    label, input, button { display: block; margin: 0.5rem 0; }
+    .hidden { display: none; }
+    canvas { margin-top: 1rem; }
+    #status { margin-top: 1rem; font-weight: bold; }
+    .section { margin-bottom: 2rem; padding: 1rem; background: white; border: 1px solid #ccc; }
+    .message { margin-top: 1rem; font-weight: bold; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+</head>
+<body>
+<h1>🎓 Prof - Génération QR Code</h1>
+
+<!-- 🔐 Section de connexion -->
+<div id="loginSection" class="section">
+  <h2>Connexion Professeur</h2>
+  <input type="email" id="email" placeholder="Email" />
+  <input type="password" id="password" placeholder="Mot de passe" />
+  <button onclick="login()">Connexion</button>
+  <p id="loginMsg" class="message"></p>
+</div>
+
+<!-- ✅ Section de génération -->
+<div id="qrSection" class="section hidden">
+  <h2>Génération dynamique de QR Code</h2>
+  <label>Identifiant de créneau :</label>
+  <input id="creneau_id" value="PHY102-17-1-2025-04-03 13:00:00" />
+  <button onclick="startQrGeneration()">Lancer</button>
+  <canvas id="qrCanvas" width="200" height="200"></canvas>
+  <p id="status"></p>
+  <button onclick="logout()" style="margin-top: 1rem;">🔓 Déconnexion</button>
+</div>
+
+<script>
+  const API = "http://localhost:3000";
+  const qr = new QRious({ element: document.getElementById("qrCanvas"), size: 200 });
+  let intervalId = null;
+
+  const jwtProf = localStorage.getItem("jwt_prof");
+
+  if (jwtProf) {
+    document.getElementById("loginSection").classList.add("hidden");
+    document.getElementById("qrSection").classList.remove("hidden");
+  }
+
+  function logout() {
+    localStorage.removeItem("jwt_prof");
+    location.reload();
+  }
+
+  async function login() {
+    const email = document.getElementById("email").value;
+    const mot_de_passe = document.getElementById("password").value;
+    const msg = document.getElementById("loginMsg");
+
+    try {
+      const res = await fetch(`${API}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, mot_de_passe })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.role === "professeur") {
+        localStorage.setItem("jwt_prof", data.token);
+        msg.textContent = "Connexion réussie ✅";
+        msg.style.color = "green";
+        setTimeout(() => location.reload(), 500);
+      } else {
+        msg.textContent = "⚠️ Accès réservé aux professeurs.";
+        msg.style.color = "red";
+      }
+    } catch {
+      msg.textContent = "Erreur de connexion.";
+      msg.style.color = "red";
+    }
+  }
+
+  async function startQrGeneration() {
+    const id = document.getElementById("creneau_id").value;
+    const token = localStorage.getItem("jwt_prof");
+
+    intervalId = setInterval(async () => {
+      try {
+        const res = await fetch(`${API}/api/creneaux/${id}/generate-qr`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          const scanUrl = `http://localhost:5173/scan/${data.token}`;
+          qr.value = scanUrl;
+          document.getElementById("status").textContent = `QR actif → ${scanUrl}`;
+        } else {
+          document.getElementById("status").textContent = data.message || "Erreur génération";
+        }
+      } catch (e) {
+        document.getElementById("status").textContent = "❌ Erreur réseau";
+      }
+    }, 5000);
+  }
+</script>
+</body>
+</html>

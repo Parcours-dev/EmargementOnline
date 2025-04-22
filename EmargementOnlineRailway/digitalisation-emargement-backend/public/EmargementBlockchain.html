@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Signature Blockchain</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin: 1rem 0 0.3rem;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.6rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin-top: 1.5rem;
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #message {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📍 Signature Blockchain</h1>
+
+    <label for="nomEtudiant">Nom Étudiant :</label>
+    <input type="text" id="nomEtudiant" value="Alexis" />
+
+    <label for="nomCours">Nom du Cours :</label>
+    <input type="text" id="nomCours" value="Gestion de Projet" />
+
+    <button onclick="signer()">🖊️ Signer la présence</button>
+
+    <p id="message"></p>
+</div>
+
+<script>
+    async function signer() {
+        const nomEtudiant = document.getElementById("nomEtudiant").value;
+        const nomCours = document.getElementById("nomCours").value;
+        const horodatage = Math.floor(Date.now() / 1000);
+        const message = document.getElementById("message");
+
+        message.textContent = "⏳ Envoi en cours...";
+        message.className = "";
+
+        try {
+            const res = await fetch("http://localhost:3000/api/ubtoken/signer", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nomEtudiant, nomCours, horodatage })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                message.textContent = data.message || "✅ Présence signée !";
+                message.className = "success";
+            } else {
+                message.textContent = data.message || "❌ Erreur lors de la signature.";
+                message.className = "error";
+            }
+
+            console.log(data);
+        } catch (err) {
+            message.textContent = "❌ Erreur réseau ou serveur.";
+            message.className = "error";
+            console.error(err);
+        }
+    }
+</script>
+
+</body>
+</html>

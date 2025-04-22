@@ -6,7 +6,7 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 declare const QRious: any;
@@ -25,14 +25,10 @@ export class GenerationQrComponent implements OnInit, OnDestroy {
   intervalId: any = null;
   compteur: number = 90;
 
-  private readonly BASE_URL = 'https://emargementonline-production.up.railway.app/api';
+  private readonly BASE_URL = 'http://localhost:3000/api';
   private creneauId = '';
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private http: HttpClient
-  ) {}
+  constructor(private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit(): void {
     const params = this.route.snapshot.queryParams;
@@ -40,8 +36,7 @@ export class GenerationQrComponent implements OnInit, OnDestroy {
 
     const tokenStorage = localStorage.getItem('_TOKEN_UTILISATEUR');
     if (!tokenStorage) {
-      console.warn("🚫 Token manquant — redirection vers l'accueil");
-      this.router.navigate(['/accueil']); // ⬅️ redirection immédiate si pas logué
+      console.warn("Token manquant — pas de génération possible");
       return;
     }
 
@@ -53,6 +48,7 @@ export class GenerationQrComponent implements OnInit, OnDestroy {
 
   demarrerGeneration(headers: HttpHeaders) {
     this.refreshQr(headers);
+
     this.intervalId = setInterval(() => {
       this.refreshQr(headers);
     }, 5000);
@@ -63,7 +59,7 @@ export class GenerationQrComponent implements OnInit, OnDestroy {
       .post<any>(`${this.BASE_URL}/creneaux/${this.creneauId}/generate-qr`, {}, { headers })
       .subscribe({
         next: (data) => {
-          const scanUrl = `https://emargementonline-production.up.railway.app/scan/${data.token}`;
+          const scanUrl = `http://localhost:5173/scan/${data.token}`;
           this.qrMessage = `QR actif → ${scanUrl}`;
           this.compteur = 90;
           this.dessinerQR(scanUrl);

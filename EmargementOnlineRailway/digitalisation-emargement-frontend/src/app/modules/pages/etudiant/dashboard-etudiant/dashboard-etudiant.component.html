@@ -44,7 +44,48 @@
                     {{ cours.present ? '✅ Présent' : '❌ Absent' }}
                   </span>
                 </div>
-              </li>
+
+                <!-- 📎 Bloc justificatif -->
+                <div *ngIf="!cours.present && !estCoursAvenir(cours)" class="mt-3 p-3 border rounded bg-light">
+                  <label class="form-label fw-semibold">Déposer un justificatif (PDF ou image) :</label>
+
+                  <div class="mb-2">
+                    <input
+                      type="file"
+                      accept=".pdf,image/*"
+                      (change)="onFileSelected($event, cours)"
+                      class="form-control"
+                    />
+                  </div>
+
+                  <div *ngIf="cours.fichier" class="text-success mb-2">
+                    ✅ <strong>{{ cours.fichier.name }}</strong> prêt à être envoyé.
+                  </div>
+
+                  <div class="mb-2">
+                    <textarea
+                      [(ngModel)]="cours.commentaire"
+                      placeholder="Ex : certificat médical, convocation..."
+                      class="form-control"
+                      rows="2"
+                    ></textarea>
+                  </div>
+
+                  <button
+                    class="btn btn-primary btn-sm"
+                    [disabled]="!cours.fichier"
+                    (click)="deposerJustificatif(cours)"
+                  >
+                    📤 Envoyer le justificatif
+                  </button>
+
+                  <div *ngIf="cours.depotOk" class="justif-success-badge">
+                    ✅ Justificatif envoyé avec succès
+                  </div>
+                  <div *ngIf="cours.depotErreur" class="alert alert-danger mt-2 p-2">
+                    ❌ Erreur lors de l'envoi du justificatif
+                  </div>
+                </div>
             </ul>
           </div>
         </section>

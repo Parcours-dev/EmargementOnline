@@ -1,7 +1,6 @@
 import {
   Component,
   OnInit,
-  OnDestroy,
   inject
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
@@ -17,13 +16,12 @@ import { FooterComponent } from "../../../core/footer/footer.component";
   templateUrl: "./dashboard-professeur.component.html",
   styleUrls: ["./dashboard-professeur.component.css"]
 })
-export class DashBoardProfesseurComponent implements OnInit, OnDestroy {
+export class DashBoardProfesseurComponent implements OnInit {
   coursDuJour: any[] = [];
   coursEnCours: any | null = null;
   etudiantsCours: any[] = [];
-  intervalId: any;
 
-  private readonly BASE_URL = "https://emargementonline-production.up.railway.app/api";
+  private readonly BASE_URL = "http://localhost:3000/api";
   private http = inject(HttpClient);
 
   ngOnInit(): void {
@@ -45,19 +43,6 @@ export class DashBoardProfesseurComponent implements OnInit, OnDestroy {
     const headers = new HttpHeaders().set("Authorization", `Bearer ${parsed.token}`);
 
     this.chargerEmploiDuTemps(idProf, headers);
-
-    // ⏱️ Auto-refresh toutes les 10 secondes si un cours est en cours
-    this.intervalId = setInterval(() => {
-      if (this.coursEnCours) {
-        this.chargerEtudiantsCoursEnCours(headers);
-      }
-    }, 10000);
-  }
-
-  ngOnDestroy(): void {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
   }
 
   decodeToken(token: string): any {
@@ -143,19 +128,16 @@ export class DashBoardProfesseurComponent implements OnInit, OnDestroy {
     });
   }
 
-  lancerGenerationQr(cours: {
-    id_cours: string;
-    id_groupe: string;
-    id_professeur: string;
-    date_heure_debut: string;
-  }): void {
-    const { id_cours, id_groupe, id_professeur, date_heure_debut } = cours;
-    const dateUTC = new Date(date_heure_debut).toISOString().slice(0, 19).replace("T", " ");
-    const identifiant = `${id_cours}-${id_groupe}-${id_professeur}-${dateUTC}`;
+  lancerGenerationQr(cours: any) {
+    const idCours = cours.id_cours;
+    const idGroupe = cours.id_groupe;
+    const idProf = cours.id_professeur;
+    const date = formatDate(cours.date_heure_debut, 'yyyy-MM-dd HH:mm:ss', 'fr-FR');
+    const identifiant = `${idCours}-${idGroupe}-${idProf}-${date}`;
     const encodedId = encodeURIComponent(identifiant);
 
     window.open(
-      `https://emargementonline-production.up.railway.app/generation-qr?creneau_id=${encodedId}`,
+      `http://localhost:4200/generation-qr?creneau_id=${encodedId}`,
       "_blank",
       "width=420,height=500"
     );

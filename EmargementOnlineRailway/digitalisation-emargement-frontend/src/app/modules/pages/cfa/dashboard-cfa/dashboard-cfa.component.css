@@ -107,3 +107,15 @@ button[type="submit"]:hover {
     padding: 10px;
   }
 }
+.text-warning {
+  color: #ffc107;
+  font-weight: bold;
+}
+.text-success {
+  color: #28a745;
+  font-weight: bold;
+}
+.text-danger {
+  color: #dc3545;
+  font-weight: bold;
+}

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { ACCUEIL } from "../../../shared/constantes/liens.const";
+import { ACCUEIL, DASHBOARD_CFA, DASHBOARD_ETUDIANT, DASHBOARD_PROFESSEUR } from "../../../shared/constantes/liens.const";
 
 @Component({
   selector: "app-header",
@@ -34,35 +34,38 @@ export class HeaderComponent implements OnInit{
     this.router.navigateByUrl(`${ACCUEIL}`);
   }
 
+  redirigeVerPageDashboardEtudiant() {
+    this.router.navigateByUrl(`${DASHBOARD_ETUDIANT}`);
+  }
+
+  redirigeVerPageDashboardCfa() {
+    this.router.navigateByUrl(`${DASHBOARD_CFA}`);
+  }
+
+  redirigeVerPageDashboardProfesseur() {
+    this.router.navigateByUrl(`${DASHBOARD_PROFESSEUR}`);
+  }
 
   private affichageHeader() {
     if (typeof window === 'undefined') return;
-
     const infosBrutes = localStorage.getItem('_INFOS_UTILISATEUR');
     const tokenBrut = localStorage.getItem('_TOKEN_UTILISATEUR');
-
     if (!infosBrutes || !tokenBrut) {
       this.estUtilisateurConnecte = false;
       return;
     }
-
     const infosUtilisateur = JSON.parse(infosBrutes);
     const tokenUtilisateur = JSON.parse(tokenBrut);
-
     this.nomUtilisateur = infosUtilisateur.nom + " " + infosUtilisateur.prenom;
-
     if (infosUtilisateur.role === this.ROLE_ETUDIANT) {
       this.doitAfficherHeaderEtudiant = true;
     }
-
     if (infosUtilisateur.role === this.ROLE_CFA) {
       this.doitAfficherHeaderCfa = true;
     }
-
     if (infosUtilisateur.role === this.ROLE_PROFESSEUR) {
       this.doitAfficherHeaderProfesseur = true;
     }
-
     if (tokenUtilisateur?.token !== null) {
       this.estUtilisateurConnecte = true;
     }

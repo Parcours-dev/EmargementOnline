@@ -135,7 +135,7 @@ const getCoursEtudiant = async (req, res) => {
     }
 
     try {
-        // 🔍 On récupère les groupes de l’étudiant
+        // 🔍 Récupération des groupes de l’étudiant
         const [[etu]] = await db.query(
             "SELECT id_groupe_TD, id_groupe_Anglais FROM etudiant WHERE NEtudiant = ?",
             [idEtudiant]
@@ -145,20 +145,25 @@ const getCoursEtudiant = async (req, res) => {
             return res.status(404).json({ message: "Étudiant introuvable" });
         }
 
-        // 📚 Récupère tous les cours de ses groupes dans la période spécifiée
+        // 📚 Récupération des cours dans les groupes de l'étudiant
         const [cours] = await db.query(
-            `SELECT c.id_cours, c.nom AS nom_cours, g.nom AS nom_groupe, 
-                    cr.date_heure_debut, cr.date_heure_fin
+            `SELECT
+                 c.id_cours,
+                 c.nom AS nom_cours,
+                 g.id_groupe,                    -- ✅ AJOUTÉ
+                 g.nom AS nom_groupe,
+                 cr.date_heure_debut,
+                 cr.date_heure_fin
              FROM creneau cr
-             JOIN cours c ON cr.id_cours = c.id_cours
-             JOIN groupe g ON cr.id_groupe = g.id_groupe
+                      JOIN cours c ON cr.id_cours = c.id_cours
+                      JOIN groupe g ON cr.id_groupe = g.id_groupe
              WHERE cr.id_groupe IN (?, ?)
                AND cr.date_heure_debut BETWEEN ? AND ?
              ORDER BY cr.date_heure_debut ASC`,
             [etu.id_groupe_TD, etu.id_groupe_Anglais, dateDebut, dateFin]
         );
 
-        // ➕ On ajoute le statut de présence pour chaque cours
+        // ➕ On ajoute le statut de présence à chaque cours
         for (const c of cours) {
             const [presence] = await db.query(
                 `SELECT * FROM emargement

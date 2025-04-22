@@ -7,9 +7,10 @@ const { UBToken } = require("../blockchain/blockchain"); // Smart contract local
 // ==============================
 const generateQrCode = async (req, res) => {
     const idProf = req.user.id;
-    const { id } = req.params;
+    const { id } = req.params; // format attendu : id_cours-id_groupe-id_professeur-date
 
     try {
+        // 🧩 On découpe le paramètre d’identifiant en éléments
         const [id_cours, id_groupe, id_professeur, ...dateParts] = id.split("-");
         const date_heure_debut = dateParts.join("-");
 
@@ -17,7 +18,7 @@ const generateQrCode = async (req, res) => {
             return res.status(400).json({ message: "Identifiant de créneau invalide." });
         }
 
-        // 🔍 Vérifie que le créneau existe
+        // 🔍 Vérifie que le créneau existe bien en base
         const [creneaux] = await db.query(
             `SELECT * FROM creneau WHERE id_cours = ? AND id_groupe = ? AND id_professeur = ? AND date_heure_debut = ?`,
             [id_cours, id_groupe, id_professeur, date_heure_debut]
@@ -27,36 +28,31 @@ const generateQrCode = async (req, res) => {
             return res.status(404).json({ message: "Créneau introuvable." });
         }
 
-        // ✅ Création du token sécurisé
+        // 🔐 Génère un token aléatoire unique et sécurisé
         const token = crypto.randomBytes(16).toString("hex");
-
-        // 🕒 Décalage UTC+2 (ajout de 2 heures)
         const now = new Date();
-        const nowPlus2h = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-        const expirationPlus2h = new Date(nowPlus2h.getTime() + 90 * 1000);
+        const expiration = new Date(now.getTime() + 90 * 1000); // Valide 1min30
 
-        const formatDate = (d) => d.toISOString().slice(0, 19).replace("T", " ");
-
-        // 💾 Insertion du QR code en base avec décalage
+        // 💾 Enregistre ce QR code en base
         await db.query(
             `INSERT INTO qr_code (token, date_creation, date_expiration, id_cours, id_groupe, id_professeur, date_heure_debut)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [token, formatDate(nowPlus2h), formatDate(expirationPlus2h), id_cours, id_groupe, id_professeur, date_heure_debut]
+            [token, now, expiration, id_cours, id_groupe, id_professeur, date_heure_debut]
         );
 
+        // ✅ Renvoie le token et l’URL de scan
         res.json({
             message: "QR Code généré ✅",
             token,
             expires_in: 90,
-            scan_url: `https://emargementonline-production.up.railway.app/scan/${token}`
+            scan_url: `http://localhost:5173/scan/${token}` // À adapter si besoin
         });
 
     } catch (err) {
-        console.error("❌ Erreur génération QR Code :", err);
-        res.status(500).json({ message: "Erreur serveur" });
+        console.error("Erreur generateQrCode :", err);
+        res.status(500).json({ message: "Erreur serveur lors de la génération du QR code." });
     }
 };
-
 
 // ========================================
 // 🧍‍♂️ 2. Scan du QR Code par un étudiant
@@ -66,32 +62,27 @@ const enregistrerPresenceViaQr = async (req, res) => {
     const { empreinte_device } = req.body;
     const user = req.user;
 
-    console.log("📲 Appel depuis :", req.user ? req.user.role : "aucun token reçu");
-
     try {
         // 🔒 Vérifie que seul un étudiant peut accéder à cette route
         if (!user || user.role !== "etudiant") {
             return res.status(403).json({ message: "Seuls les étudiants peuvent émarger via QR Code." });
         }
 
-        // 1️⃣ Vérifie la validité du QR code (on compare les dates en JS pour gérer le fuseau)
-        const [result] = await db.query(`SELECT * FROM qr_code WHERE token = ?`, [token]);
+        // 1️⃣ Vérifie la validité du QR code
+        const [result] = await db.query(
+            `SELECT * FROM qr_code WHERE token = ? AND date_expiration >= NOW()`,
+            [token]
+        );
 
         if (result.length === 0) {
-            return res.status(400).json({ message: "QR Code introuvable." });
+            return res.status(400).json({ message: "QR Code expiré ou invalide." });
         }
 
         const qr = result[0];
-        const now = new Date();
-        const expiration = new Date(qr.date_expiration);
-
-        if (now > expiration) {
-            return res.status(400).json({ message: "QR Code expiré." });
-        }
 
         // 2️⃣ Vérifie que l’empreinte device n’a pas déjà été utilisée
         const [deviceExists] = await db.query(
-            `SELECT * FROM emargement
+            `SELECT * FROM emargement 
              WHERE empreinte_device = ? AND id_cours = ? AND date_heure_debut = ?`,
             [empreinte_device, qr.id_cours, qr.date_heure_debut]
         );
@@ -113,8 +104,8 @@ const enregistrerPresenceViaQr = async (req, res) => {
 
         // 4️⃣ Enregistrement de la présence
         await db.query(
-            `INSERT INTO emargement
-             (NEtudiant, id_cours, id_groupe, id_professeur, date_heure_signature, date_heure_debut,
+            `INSERT INTO emargement 
+             (NEtudiant, id_cours, id_groupe, id_professeur, date_heure_signature, date_heure_debut, 
               token_utilisé, empreinte_device, ip_adresse, user_agent)
              VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)`,
             [
@@ -130,7 +121,7 @@ const enregistrerPresenceViaQr = async (req, res) => {
             ]
         );
 
-        // 5️⃣ Récompense via UBToken
+        // 5️⃣ Récupération de l'adresse ETH de l'étudiant
         const [[etu]] = await db.query(
             "SELECT adresse_eth FROM etudiant WHERE NEtudiant = ?",
             [user.id]

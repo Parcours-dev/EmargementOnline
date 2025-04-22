@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📲 Scan Présence Étudiant</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #f4f4f4; }
+    h1 { font-size: 1.8rem; }
+    .hidden { display: none; }
+    .message { margin-top: 1rem; font-weight: bold; }
+    input, button { display: block; margin: 1rem 0; padding: 0.5rem; width: 100%; max-width: 300px; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/jssha/dist/sha256.js"></script>
+  <script src="config.js"></script>
+</head>
+<body>
+
+<h1>📲 Validation de présence</h1>
+<div id="status">🛰️ Validation en cours...</div>
+
+<!-- 🔐 Connexion Étudiant -->
+<div id="loginSection" class="hidden">
+  <h2>Connexion Étudiant</h2>
+  <input type="email" id="email" placeholder="Email étudiant" />
+  <input type="password" id="password" placeholder="Mot de passe" />
+  <button onclick="login()">Connexion</button>
+  <div class="message" id="loginMsg"></div>
+</div>
+
+<div class="message" id="resultMsg"></div>
+
+<script>
+  const API_URL = BACKEND_URL;
+  const token = new URLSearchParams(window.location.search).get("token");
+  const jwtKey = "jwt_etudiant";
+  const jwt = localStorage.getItem(jwtKey);
+
+  const status = document.getElementById("status");
+  const resultMsg = document.getElementById("resultMsg");
+  const loginSection = document.getElementById("loginSection");
+
+  async function generateFingerprint() {
+    const existing = localStorage.getItem("fingerprint");
+    if (existing) return existing;
+
+    function getCanvasFingerprint() {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      ctx.textBaseline = "top";
+      ctx.font = "14px Arial";
+        ctx.fillText("Hello, world!", 2, 2);
+        return canvas.toDataURL();
+    }
+    function getUserAgentFingerprint() {
+      return navigator.userAgent;
+    }
+    function getScreenFingerprint() {
+      return `${screen.width}x${screen.height}`;
+    }
+    function getTimezoneFingerprint() {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+    function getLanguageFingerprint() {
+      return navigator.language || navigator.userLanguage;
+    }
+

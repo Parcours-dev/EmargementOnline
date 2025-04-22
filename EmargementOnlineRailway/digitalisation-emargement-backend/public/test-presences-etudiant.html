@@ -1,0 +1,144 @@
+ <!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Récap Présences Étudiant</title>
+    <style>
+        body { font-family: sans-serif; background: #f9f9f9; padding: 2rem; }
+        h1 { color: #333; }
+        .hidden { display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+        .present { color: green; font-weight: bold; }
+        .absent { color: red; font-weight: bold; }
+        input, button { margin: 0.5rem 0; padding: 0.4rem; }
+    </style>
+</head>
+<body>
+
+<h1>📘 Récapitulatif des Présences</h1>
+
+<!-- 🔐 Connexion -->
+<div id="loginSection">
+    <h2>Connexion Étudiant</h2>
+    <input type="email" id="email" placeholder="Email étudiant" />
+    <input type="password" id="password" placeholder="Mot de passe" />
+    <button onclick="login()">Connexion</button>
+    <p id="loginMsg"></p>
+</div>
+
+<!-- 👤 Contenu après connexion -->
+<div id="mainSection" class="hidden">
+    <h2>👋 Bienvenue <span id="prenom"></span> !</h2>
+
+    <fieldset>
+        <legend>📅 Filtrer les cours</legend>
+
+        <label>Date unique :
+            <input type="date" id="date" />
+        </label>
+
+        <p>— ou —</p>
+
+        <label>Depuis :
+            <input type="date" id="from" />
+        </label>
+        <label>Jusqu’à :
+            <input type="date" id="to" />
+        </label>
+
+        <button onclick="chargerPresences()">🔍 Rechercher</button>
+    </fieldset>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Cours</th>
+            <th>Heure</th>
+            <th>Groupe</th>
+            <th>Présence</th>
+        </tr>
+        </thead>
+        <tbody id="tableBody">
+        <!-- rows dynamiques -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const API = "http://localhost:3000";
+    let jwt = null;
+    let id_etudiant = null;
+
+    async function login() {
+        const email = document.getElementById("email").value;
+        const mot_de_passe = document.getElementById("password").value;
+
+        const res = await fetch(`${API}/api/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, mot_de_passe })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.role === "etudiant") {
+            jwt = data.token;
+            id_etudiant = data.id;
+            document.getElementById("loginSection").classList.add("hidden");
+            document.getElementById("mainSection").classList.remove("hidden");
+            document.getElementById("prenom").textContent = data.prenom;
+            chargerPresences(); // charge automatiquement
+        } else {
+            document.getElementById("loginMsg").textContent = "Échec de connexion ou rôle incorrect.";
+        }
+    }
+
+    async function chargerPresences() {
+        const date = document.getElementById("date").value;
+        const from = document.getElementById("from").value;
+        const to = document.getElementById("to").value;
+
+        let url = `${API}/api/etudiants/mes-presences`;
+
+        if (date) {
+            url += `?date=${date}`;
+        } else if (from && to) {
+            url += `?from=${from}&to=${to}`;
+        }
+
+        const res = await fetch(url, {
+            headers: { Authorization: `Bearer ${jwt}` }
+        });
+
+        const data = await res.json();
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
+
+        if (!res.ok) {
+            alert(data.message || "Erreur serveur.");
+            return;
+        }
+
+        if (data.length === 0) {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td colspan="4">Aucun cours trouvé</td>`;
+            tbody.appendChild(row);
+            return;
+        }
+
+        data.forEach(item => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${item.nom_cours}</td>
+                <td>${item.date_heure_debut} - ${item.date_heure_fin}</td>
+                <td>${item.nom_groupe}</td>
+                <td class="${item.present ? "present" : "absent"}">${item.present ? "Présent" : "Absent"}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+</script>
+
+</body>
+</html>

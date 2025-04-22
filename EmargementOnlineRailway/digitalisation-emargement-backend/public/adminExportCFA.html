@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Export Présences - CFA</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f9f9f9;
+            padding: 2rem;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        input, select, button {
+            margin: 0.5rem 0;
+            padding: 0.4rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        .present {
+            color: green;
+        }
+        .absent {
+            color: red;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>📊 Export des Présences</h1>
+
+<!-- 🔐 Connexion -->
+<div id="loginBox">
+    <h2>Connexion CFA</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Mot de passe" />
+    <button onclick="login()">Se connecter</button>
+    <p id="loginMsg"></p>
+</div>
+
+<!-- 🎯 Filtres + Résultat -->
+<div id="mainSection" class="hidden">
+    <h2>🎯 Filtres</h2>
+
+    <label>Promo :
+        <input id="promo" placeholder="Ex: 2023-A" />
+    </label>
+    <label>Groupe TD :
+        <input id="groupeTD" placeholder="ID groupe TD" />
+    </label>
+    <label>Groupe Anglais :
+        <input id="groupeAnglais" placeholder="ID groupe anglais" />
+    </label>
+    <label>Étudiant (email) :
+        <input id="emailEtudiant" placeholder="email@etu.fr" />
+    </label>
+
+    <label>Date :
+        <input type="date" id="date" />
+    </label>
+    <label>ou De :
+        <input type="date" id="from" />
+        à :
+        <input type="date" id="to" />
+    </label>
+
+    <label>Type :
+        <select id="type">
+            <option value="">-- Tous --</option>
+            <option value="presents">Présents</option>
+            <option value="absents">Absents</option>
+        </select>
+    </label>
+
+    <label>Afficher infos techniques :
+        <input type="checkbox" id="withInfos" />
+    </label>
+
+    <button onclick="appliquerFiltres()">🔍 Appliquer les filtres</button>
+    <button onclick="exporter()">📁 Exporter</button>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Étudiant</th>
+            <th>Cours</th>
+            <th>Début</th>
+            <th>Fin</th>
+            <th>Présence</th>
+            <th id="ipHeader" class="hidden">IP</th>
+            <th id="uaHeader" class="hidden">User Agent</th>
+            <th id="ajoutHeader" class="hidden">Ajout manuel</th>
+        </tr>
+        </thead>
+        <tbody id="resultsTable"></tbody>
+    </table>
+</div>
+
+<script>
+    const API = "http://localhost:3000";
+    let jwt = null;
+    let dernierResultat = [];
+
+    async function login() {
+        const email = document.getElementById("email").value;
+        const mot_de_passe = document.getElementById("password").value;
+
+        const res = await fetch(`${API}/api/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, mot_de_passe })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.role === "cfa") {
+            jwt = data.token;
+            document.getElementById("loginBox").classList.add("hidden");
+            document.getElementById("mainSection").classList.remove("hidden");
+        } else {
+            document.getElementById("loginMsg").textContent = "Connexion échouée ou rôle non autorisé.";
+        }
+    }
+
+    async function appliquerFiltres() {
+        const params = new URLSearchParams();
+        const champs = [
+            ["promo", "promo"],
+            ["groupeTD", "id_groupe_TD"],
+            ["groupeAnglais", "id_groupe_Anglais"],
+            ["emailEtudiant", "email"],
+            ["date", "date"],
+            ["from", "from"],
+            ["to", "to"],
+            ["type", "type"],
+            ["withInfos", "includeDetails"]
+        ];
+
+        champs.forEach(([inputId, paramName]) => {
+            const el = document.getElementById(inputId);
+            if (el.type === "checkbox") {
+                if (el.checked) params.append(paramName, "true");
+            } else if (el.value) {
+                params.append(paramName, el.value);
+            }
+        });
+
+        const res = await fetch(`${API}/api/cfa/export?${params.toString()}`, {
+            headers: { Authorization: `Bearer ${jwt}` }
+        });
+
+        const data = await res.json();
+        dernierResultat = data;
+
+        const tbody = document.getElementById("resultsTable");
+        tbody.innerHTML = "";
+
+        const showInfos = document.getElementById("withInfos").checked;
+        document.getElementById("ipHeader").classList.toggle("hidden", !showInfos);
+        document.getElementById("uaHeader").classList.toggle("hidden", !showInfos);
+        document.getElementById("ajoutHeader").classList.toggle("hidden", !showInfos);
+
+        data.forEach(pres => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${pres.nom} ${pres.prenom}</td>
+                <td>${pres.nom_cours}</td>
+                <td>${pres.date_heure_debut}</td>
+                <td>${pres.date_heure_fin}</td>
+                <td class="${pres.present ? "present" : "absent"}">${pres.present ? "✅" : "❌"}</td>
+                ${showInfos ? `
+                    <td>${pres.ip_adresse || ""}</td>
+                    <td>${(pres.user_agent || "").substring(0, 30)}</td>
+                    <td>${pres.ajout_manuel ? "Oui" : "Non"}</td>
+                ` : ""}
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    async function exporter() {
+        if (!dernierResultat.length) {
+            alert("Aucune donnée à exporter. Appliquez des filtres d'abord.");
+            return;
+        }
+
+        const params = new URLSearchParams();
+        const champs = [
+            ["promo", "promo"],
+            ["groupeTD", "id_groupe_TD"],
+            ["groupeAnglais", "id_groupe_Anglais"],
+            ["emailEtudiant", "email"],
+            ["date", "date"],
+            ["from", "from"],
+            ["to", "to"],
+            ["type", "type"],
+            ["withInfos", "includeDetails"]
+        ];
+
+        champs.forEach(([inputId, paramName]) => {
+            const el = document.getElementById(inputId);
+            if (el.type === "checkbox") {
+                if (el.checked) params.append(paramName, "true");
+            } else if (el.value) {
+                params.append(paramName, el.value);
+            }
+        });
+
+        params.append("export", "true");
+
+        try {
+            const res = await fetch(`${API}/api/cfa/export-file?${params.toString()}`, {
+                headers: { Authorization: `Bearer ${jwt}` }
+            });
+
+            if (!res.ok) throw new Error("Erreur lors de l'export");
+
+            const blob = await res.blob();
+            const filename = res.headers.get("Content-Disposition")?.split("filename=")[1] || "export.xlsx";
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error("Erreur export :", err);
+            alert("Erreur lors de l'export. Vérifie ta connexion ou ton token.");
+        }
+    }
+</script>
+
+</body>
+</html>

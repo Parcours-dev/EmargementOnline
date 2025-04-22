@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion Étudiants - CFA</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 2rem; }
+        .hidden { display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: white; }
+        th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+        th { background: #eee; }
+        input, button { margin: 0.5rem 0; padding: 0.4rem; }
+        form { background: #fff; padding: 1rem; border: 1px solid #ccc; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+
+<h1>🎓 Gestion des Étudiants</h1>
+
+<!-- Connexion CFA -->
+<div id="loginBox">
+    <h2>Connexion CFA</h2>
+    <input type="email" id="email" placeholder="Email CFA" />
+    <input type="password" id="password" placeholder="Mot de passe" />
+    <button onclick="login()">Se connecter</button>
+    <p id="loginMsg"></p>
+</div>
+
+<!-- Section principale -->
+<div id="mainSection" class="hidden">
+    <h2>📋 Liste des étudiants</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>NEtudiant</th><th>Nom</th><th>Prénom</th><th>Email</th><th>TD</th><th>Anglais</th><th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <form onsubmit="handleFormSubmit(event)">
+        <h3 id="formTitle">➕ Ajouter un étudiant</h3>
+        <input type="hidden" id="isEditing" />
+        <label>NEtudiant : <input id="NEtudiant" required /></label>
+        <label>Nom : <input id="nom" required /></label>
+        <label>Prénom : <input id="prenom" required /></label>
+        <label>Email : <input id="emailEtudiant" required /></label>
+        <label>Mot de passe : <input id="mdp" required /></label>
+        <label>ID Groupe TD : <input id="idGroupeTD" required /></label>
+        <label>ID Groupe Anglais : <input id="idGroupeAnglais" required /></label>
+        <button type="submit">💾 Enregistrer</button>
+    </form>
+</div>
+
+<script>
+    const API = "http://localhost:3000";
+    let jwt = null;
+
+    async function login() {
+        const email = document.getElementById("email").value;
+        const mot_de_passe = document.getElementById("password").value;
+
+        const res = await fetch(`${API}/api/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, mot_de_passe })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.role === "cfa") {
+            jwt = data.token;
+            document.getElementById("loginBox").classList.add("hidden");
+            document.getElementById("mainSection").classList.remove("hidden");
+            loadEtudiants();
+        } else {
+            document.getElementById("loginMsg").textContent = "Connexion échouée ou non autorisée.";
+        }
+    }
+
+    async function loadEtudiants() {
+        const res = await fetch(`${API}/api/cfa/etudiants`, {
+            headers: { Authorization: `Bearer ${jwt}` }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = "";
+
+        data.forEach(e => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${e.NEtudiant}</td>
+                <td>${e.nom}</td>
+                <td>${e.prenom}</td>
+                <td>${e.email}</td>
+                <td>${e.id_groupe_TD}</td>
+                <td>${e.id_groupe_Anglais}</td>
+                <td>
+                    <button onclick="editEtudiant(${e.NEtudiant}, '${e.nom}', '${e.prenom}', '${e.email}', '${e.id_groupe_TD}', '${e.id_groupe_Anglais}')">✏️</button>
+                    <button onclick="deleteEtudiant(${e.NEtudiant})">🗑️</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function editEtudiant(id, nom, prenom, email, td, anglais) {
+        document.getElementById("formTitle").textContent = "✏️ Modifier un étudiant";
+        document.getElementById("isEditing").value = "1";
+        document.getElementById("NEtudiant").value = id;
+        document.getElementById("nom").value = nom;
+        document.getElementById("prenom").value = prenom;
+        document.getElementById("emailEtudiant").value = email;
+        document.getElementById("idGroupeTD").value = td;
+        document.getElementById("idGroupeAnglais").value = anglais;
+        document.getElementById("mdp").value = "";
+    }
+
+    async function deleteEtudiant(id) {
+        if (!confirm("Confirmer la suppression de l'étudiant ?")) return;
+        const res = await fetch(`${API}/api/cfa/etudiants/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${jwt}` }
+        });
+        const data = await res.json();
+        alert(data.message);
+        loadEtudiants();
+    }
+
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        const NEtudiant = document.getElementById("NEtudiant").value;
+        const nom = document.getElementById("nom").value;
+        const prenom = document.getElementById("prenom").value;
+        const email = document.getElementById("emailEtudiant").value;
+        const mot_de_passe = document.getElementById("mdp").value;
+        const id_groupe_TD = document.getElementById("idGroupeTD").value;
+        const id_groupe_Anglais = document.getElementById("idGroupeAnglais").value;
+
+        const isEditing = document.getElementById("isEditing").value;
+        const method = isEditing ? "PUT" : "POST";
+        const url = isEditing
+            ? `${API}/api/cfa/etudiants/${NEtudiant}`
+            : `${API}/api/cfa/etudiants`;
+
+        const body = JSON.stringify({ NEtudiant, nom, prenom, email, mot_de_passe, id_groupe_TD, id_groupe_Anglais });
+
+        const res = await fetch(url, {
+            method,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${jwt}`
+            },
+            body
+        });
+
+        const data = await res.json();
+        alert(data.message);
+        e.target.reset();
+        document.getElementById("formTitle").textContent = "➕ Ajouter un étudiant";
+        document.getElementById("isEditing").value = "";
+        loadEtudiants();
+    }
+</script>
+
+</body>
+</html>

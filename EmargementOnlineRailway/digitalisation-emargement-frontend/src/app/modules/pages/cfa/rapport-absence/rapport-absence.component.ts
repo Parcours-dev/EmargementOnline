@@ -12,7 +12,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
   templateUrl: "./rapport-absence.component.html",
 })
 export class RapportAbsenceComponent implements OnInit {
-  private readonly API = "https://emargementonline-production.up.railway.app/api";
+  private readonly API = "http://localhost:3000/api";
   private http = inject(HttpClient);
 
   headers: HttpHeaders | null = null;
