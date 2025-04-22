@@ -41,7 +41,7 @@ export class GenerationQrComponent implements OnInit, OnDestroy {
     const tokenStorage = localStorage.getItem('_TOKEN_UTILISATEUR');
     if (!tokenStorage) {
       console.warn("🚫 Token manquant — redirection vers l'accueil");
-      this.router.navigate(['/accueil']); // ⬅️ redirection immédiate
+      this.router.navigate(['/accueil']); // ⬅️ redirection immédiate si pas logué
       return;
     }
 
