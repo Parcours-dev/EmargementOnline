@@ -72,21 +72,24 @@ const enregistrerPresenceViaQr = async (req, res) => {
             return res.status(403).json({ message: "Seuls les étudiants peuvent émarger via QR Code." });
         }
 
-        // 1️⃣ Vérifie la validité du QR code
-        const [result] = await db.query(
-            `SELECT * FROM qr_code WHERE token = ? AND date_expiration >= NOW()`,
-            [token]
-        );
+        // 1️⃣ Vérifie la validité du QR code (on compare les dates en JS pour gérer le fuseau)
+        const [result] = await db.query(`SELECT * FROM qr_code WHERE token = ?`, [token]);
 
         if (result.length === 0) {
-            return res.status(400).json({ message: "QR Code expiré ou invalide." });
+            return res.status(400).json({ message: "QR Code introuvable." });
         }
 
         const qr = result[0];
+        const now = new Date();
+        const expiration = new Date(qr.date_expiration);
+
+        if (now > expiration) {
+            return res.status(400).json({ message: "QR Code expiré." });
+        }
 
         // 2️⃣ Vérifie que l’empreinte device n’a pas déjà été utilisée
         const [deviceExists] = await db.query(
-            `SELECT * FROM emargement 
+            `SELECT * FROM emargement
              WHERE empreinte_device = ? AND id_cours = ? AND date_heure_debut = ?`,
             [empreinte_device, qr.id_cours, qr.date_heure_debut]
         );
@@ -108,8 +111,8 @@ const enregistrerPresenceViaQr = async (req, res) => {
 
         // 4️⃣ Enregistrement de la présence
         await db.query(
-            `INSERT INTO emargement 
-             (NEtudiant, id_cours, id_groupe, id_professeur, date_heure_signature, date_heure_debut, 
+            `INSERT INTO emargement
+             (NEtudiant, id_cours, id_groupe, id_professeur, date_heure_signature, date_heure_debut,
               token_utilisé, empreinte_device, ip_adresse, user_agent)
              VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)`,
             [
@@ -125,7 +128,7 @@ const enregistrerPresenceViaQr = async (req, res) => {
             ]
         );
 
-        // 5️⃣ Récupération de l'adresse ETH de l'étudiant
+        // 5️⃣ Récompense via UBToken
         const [[etu]] = await db.query(
             "SELECT adresse_eth FROM etudiant WHERE NEtudiant = ?",
             [user.id]
