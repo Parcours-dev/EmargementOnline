@@ -6,7 +6,7 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 declare const QRious: any;
@@ -28,7 +28,11 @@ export class GenerationQrComponent implements OnInit, OnDestroy {
   private readonly BASE_URL = 'https://emargementonline-production.up.railway.app/api';
   private creneauId = '';
 
-  constructor(private route: ActivatedRoute, private http: HttpClient) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private http: HttpClient
+  ) {}
 
   ngOnInit(): void {
     const params = this.route.snapshot.queryParams;
@@ -36,7 +40,8 @@ export class GenerationQrComponent implements OnInit, OnDestroy {
 
     const tokenStorage = localStorage.getItem('_TOKEN_UTILISATEUR');
     if (!tokenStorage) {
-      console.warn("Token manquant — pas de génération possible");
+      console.warn("🚫 Token manquant — redirection vers l'accueil");
+      this.router.navigate(['/accueil']); // ⬅️ redirection immédiate
       return;
     }
 
@@ -48,7 +53,6 @@ export class GenerationQrComponent implements OnInit, OnDestroy {
 
   demarrerGeneration(headers: HttpHeaders) {
     this.refreshQr(headers);
-
     this.intervalId = setInterval(() => {
       this.refreshQr(headers);
     }, 5000);
