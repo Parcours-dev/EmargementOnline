@@ -7,10 +7,9 @@ const { UBToken } = require("../blockchain/blockchain"); // Smart contract local
 // ==============================
 const generateQrCode = async (req, res) => {
     const idProf = req.user.id;
-    const { id } = req.params; // format attendu : id_cours-id_groupe-id_professeur-date
+    const { id } = req.params;
 
     try {
-        // 🧩 On découpe le paramètre d’identifiant en éléments
         const [id_cours, id_groupe, id_professeur, ...dateParts] = id.split("-");
         const date_heure_debut = dateParts.join("-");
 
@@ -18,7 +17,7 @@ const generateQrCode = async (req, res) => {
             return res.status(400).json({ message: "Identifiant de créneau invalide." });
         }
 
-        // 🔍 Vérifie que le créneau existe bien en base
+        // 🔍 Vérifie que le créneau existe
         const [creneaux] = await db.query(
             `SELECT * FROM creneau WHERE id_cours = ? AND id_groupe = ? AND id_professeur = ? AND date_heure_debut = ?`,
             [id_cours, id_groupe, id_professeur, date_heure_debut]
@@ -28,23 +27,23 @@ const generateQrCode = async (req, res) => {
             return res.status(404).json({ message: "Créneau introuvable." });
         }
 
+        // ✅ Création du token sécurisé
         const token = crypto.randomBytes(16).toString("hex");
 
+        // 🕒 Décalage UTC+2 (ajout de 2 heures)
         const now = new Date();
-        const expiration = new Date(now.getTime() + 90 * 1000);
+        const nowPlus2h = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+        const expirationPlus2h = new Date(nowPlus2h.getTime() + 90 * 1000);
 
-    // Convertir en format UTC explicite pour MySQL
         const formatDate = (d) => d.toISOString().slice(0, 19).replace("T", " ");
 
-    // Pour l’enregistrement du QR code :
+        // 💾 Insertion du QR code en base avec décalage
         await db.query(
             `INSERT INTO qr_code (token, date_creation, date_expiration, id_cours, id_groupe, id_professeur, date_heure_debut)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [token, formatDate(now), formatDate(expiration), id_cours, id_groupe, id_professeur, date_heure_debut]
+            [token, formatDate(nowPlus2h), formatDate(expirationPlus2h), id_cours, id_groupe, id_professeur, date_heure_debut]
         );
 
-
-        // ✅ Renvoie le token et l’URL de scan
         res.json({
             message: "QR Code généré ✅",
             token,
@@ -53,10 +52,11 @@ const generateQrCode = async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Erreur generateQrCode :", err);
-        res.status(500).json({ message: "Erreur serveur lors de la génération du QR code." });
+        console.error("❌ Erreur génération QR Code :", err);
+        res.status(500).json({ message: "Erreur serveur" });
     }
 };
+
 
 // ========================================
 // 🧍‍♂️ 2. Scan du QR Code par un étudiant
