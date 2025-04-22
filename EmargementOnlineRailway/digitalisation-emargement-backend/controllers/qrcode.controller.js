@@ -66,6 +66,8 @@ const enregistrerPresenceViaQr = async (req, res) => {
     const { empreinte_device } = req.body;
     const user = req.user;
 
+    console.log("📲 Appel depuis :", req.user ? req.user.role : "aucun token reçu");
+
     try {
         // 🔒 Vérifie que seul un étudiant peut accéder à cette route
         if (!user || user.role !== "etudiant") {
