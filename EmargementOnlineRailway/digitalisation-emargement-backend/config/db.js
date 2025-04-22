@@ -1,10 +1,11 @@
-const mysql = require("mysql2/promise");
+const mysql = require('mysql2/promise');
 
-const db = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "emargement_db",
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,     // Railway va injecter ces vars
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT || 3306, // utile si Railway change le port
 });
 
-module.exports = db;
+module.exports = pool;
