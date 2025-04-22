@@ -1,5 +1,4 @@
-// src/app/shared/constantes/api.const.ts
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 
 export const API_BACKEND = environment.apiUrl;
 
