@@ -30,15 +30,17 @@ const generateQrCode = async (req, res) => {
 
         const token = crypto.randomBytes(16).toString("hex");
 
-        // Décale de +2h (UTC+2)
         const now = new Date();
-        const nowPlus2h = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-        const expirationPlus2h = new Date(nowPlus2h.getTime() + 90 * 1000); // +90 secondes
+        const expiration = new Date(now.getTime() + 90 * 1000);
 
+    // Convertir en format UTC explicite pour MySQL
+        const formatDate = (d) => d.toISOString().slice(0, 19).replace("T", " ");
+
+    // Pour l’enregistrement du QR code :
         await db.query(
             `INSERT INTO qr_code (token, date_creation, date_expiration, id_cours, id_groupe, id_professeur, date_heure_debut)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [token, nowPlus2h, expirationPlus2h, id_cours, id_groupe, id_professeur, date_heure_debut]
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [token, formatDate(now), formatDate(expiration), id_cours, id_groupe, id_professeur, date_heure_debut]
         );
 
 
