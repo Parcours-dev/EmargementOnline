@@ -8,9 +8,10 @@
     </ng-template>
   </div>
 
-  <app-face-scan (faceVerified)="onFaceVerified($event)"></app-face-scan>
-
   <p class="instruction-message" [ngClass]="messageType">
     {{ message }}
   </p>
+
+  <app-face-scan (faceVerified)="onFaceVerified($event)"></app-face-scan>
+
 </div>

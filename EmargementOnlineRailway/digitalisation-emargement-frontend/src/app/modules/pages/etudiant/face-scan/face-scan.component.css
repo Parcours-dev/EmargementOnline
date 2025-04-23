@@ -1,17 +1,21 @@
-/* Général */
+/* ========================
+   ⚙️ STRUCTURE GLOBALE
+======================== */
 .scan-page {
   display: flex;
   flex-direction: column;
   align-items: center;
   font-family: 'Inter', 'Helvetica', sans-serif;
-  padding: 1.5rem 1rem;
+  padding: 1rem 1rem 2rem;
   min-height: 100vh;
   background-color: #f9f9f9;
   max-width: 480px;
-  margin: auto;
+  margin: 0 auto;
 }
 
-/* Zone info référence */
+/* ========================
+   🔷 INFO RÉFÉRENCE
+======================== */
 .reference-status {
   width: 100%;
   margin-bottom: 1rem;
@@ -22,9 +26,12 @@
   font-size: 0.95rem;
   color: #0c4a6e;
   box-sizing: border-box;
+  text-align: left;
 }
 
-/* Conteneur vidéo */
+/* ========================
+   🎥 ZONE VIDÉO
+======================== */
 .video-container {
   display: flex;
   flex-direction: column;
@@ -33,7 +40,6 @@
   width: 100%;
 }
 
-/* Cadre vidéo */
 .video-frame {
   position: relative;
   width: 100%;
@@ -51,7 +57,7 @@ video {
   object-fit: cover;
 }
 
-/* Masque ovale */
+/* 🎯 Masque ovale pour centrage du visage */
 .oval-mask {
   position: absolute;
   top: 50%;
@@ -65,15 +71,19 @@ video {
   box-sizing: border-box;
 }
 
-/* Message dynamique */
+/* ========================
+   📩 MESSAGES
+======================== */
 .instruction-message,
 .status-message {
   margin-top: 1rem;
+  padding: 0 1rem;
   text-align: center;
   font-weight: 500;
   font-size: 0.95rem;
   transition: color 0.3s ease;
-  padding: 0 1rem;
+  max-width: 360px;
+  word-break: break-word;
 }
 
 .instruction-message.success {
@@ -88,7 +98,9 @@ video {
   color: #444;
 }
 
-/* Bouton scanner */
+/* ========================
+   🖱️ BOUTONS
+======================== */
 .capture-btn {
   margin-top: 0.5rem;
   background-color: #2196f3;
@@ -112,7 +124,6 @@ video {
   cursor: not-allowed;
 }
 
-/* Bouton retour (si utilisé plus tard) */
 .return-btn {
   margin-top: 1rem;
   background: transparent;
@@ -121,4 +132,26 @@ video {
   border: none;
   cursor: pointer;
   text-decoration: underline;
+}
+
+/* ========================
+   📱 RESPONSIVE BOOST
+======================== */
+@media (max-width: 400px) {
+  .video-frame {
+    height: 340px;
+  }
+
+  .instruction-message {
+    font-size: 0.9rem;
+  }
+
+  .reference-status {
+    font-size: 0.9rem;
+  }
+
+  .capture-btn {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+  }
 }
