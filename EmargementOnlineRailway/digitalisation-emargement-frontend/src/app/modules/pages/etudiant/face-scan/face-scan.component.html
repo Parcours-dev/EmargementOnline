@@ -1,8 +1,13 @@
-<div class="scan-container">
-  <div class="video-wrapper">
-    <video #video autoplay muted playsinline></video>
-    <div class="overlay-mask"></div>
+<div class="scan-page">
+  <h1 class="title">📷 Scan facial en cours...</h1>
+
+  <div class="video-container">
+    <div class="video-frame">
+      <video #video autoplay muted playsinline></video>
+      <div class="oval-mask"></div>
+    </div>
+    <p class="instruction">{{ message }}</p>
+    <button class="capture-btn" (click)="captureAndEmit()" [disabled]="!modelsLoaded">📸 Scanner visage</button>
+    <button class="return-btn" routerLink="/dashboard-etudiant">⬅️ Retour</button>
   </div>
-  <p class="instruction">{{ message }}</p>
-  <button class="capture-btn" (click)="captureAndEmit()" [disabled]="!modelsLoaded">📸 Scanner visage</button>
 </div>
