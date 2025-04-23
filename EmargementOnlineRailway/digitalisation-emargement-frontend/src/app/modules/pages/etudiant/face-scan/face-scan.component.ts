@@ -18,9 +18,8 @@ import * as faceapi from 'face-api.js';
 })
 export class FaceScanComponent implements OnInit, AfterViewInit {
   @ViewChild('video') videoRef!: ElementRef<HTMLVideoElement>;
-  @Output() faceVerified = new EventEmitter<number[]>(); // ✅ Ajout de l'output
+  @Output() faceVerified = new EventEmitter<number[]>();
 
-  loading = true;
   message = 'Chargement...';
 
   ngOnInit() {
@@ -34,8 +33,9 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
     try {
       await Promise.all([
         faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
         faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+        // ❌ pas de TinyYolov2 ici !
       ]);
       this.message = '📸 Modèles chargés. Initialisation caméra...';
     } catch (e) {
@@ -64,7 +64,7 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
     console.log('📸 Bouton cliqué, capture en cours...');
 
     const result = await faceapi
-      .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+      .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()) // ✅ c'est bon
       .withFaceLandmarks()
       .withFaceDescriptor();
 
@@ -73,9 +73,9 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const descriptorArray = Array.from(result.descriptor); // ✅ variable définie
+    const descriptorArray = Array.from(result.descriptor);
     this.message = '✅ Visage capturé. Envoi au parent...';
 
-    this.faceVerified.emit(descriptorArray); // ✅ émet les données vers le parent
+    this.faceVerified.emit(descriptorArray);
   }
 }
