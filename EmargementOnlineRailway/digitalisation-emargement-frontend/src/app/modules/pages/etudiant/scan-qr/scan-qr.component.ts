@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
@@ -10,9 +10,10 @@ import { FaceScanComponent } from '../face-scan/face-scan.component';
   imports: [CommonModule, FaceScanComponent],
   templateUrl: './scan-qr.component.html',
 })
-export class ScanQrComponent {
+export class ScanQrComponent implements OnInit {
   tokenQr = '';
   message = '📷 Scan facial en cours...';
+  hasReference: boolean | null = null;
 
   private readonly BASE_URL = 'https://emargementonline-production.up.railway.app/api';
 
@@ -22,6 +23,25 @@ export class ScanQrComponent {
     private router: Router
   ) {
     this.tokenQr = this.route.snapshot.paramMap.get('token') || '';
+  }
+
+  async ngOnInit() {
+    const tokenStorage = localStorage.getItem('_TOKEN_UTILISATEUR');
+    if (!tokenStorage) return;
+
+    const token = JSON.parse(tokenStorage).token;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    try {
+      const existsResponse = await this.http
+        .get<{ exists: boolean }>(`${this.BASE_URL}/etudiants/photo-reference`, { headers })
+        .toPromise();
+
+      this.hasReference = existsResponse?.exists ?? false;
+    } catch (err) {
+      console.warn('Erreur récupération photo de référence :', err);
+      this.hasReference = null;
+    }
   }
 
   async onFaceVerified(descriptor: number[]) {
@@ -37,14 +57,7 @@ export class ScanQrComponent {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     try {
-      // 1. Vérifier si une photo de référence existe
-      const existsResponse = await this.http
-        .get<{ exists: boolean }>(`${this.BASE_URL}/etudiants/photo-reference`, { headers })
-        .toPromise();
-
-      const exists = existsResponse?.exists ?? false;
-
-      if (!exists) {
+      if (!this.hasReference) {
         this.message = '📸 Enregistrement photo de référence...';
 
         await this.http
@@ -53,7 +66,6 @@ export class ScanQrComponent {
 
         this.message = '✅ Référence enregistrée. Validation de présence...';
       } else {
-        // 2. Comparaison avec référence
         const matchResponse = await this.http
           .post<{ match: boolean }>(
             `${this.BASE_URL}/etudiants/face-verify`,
@@ -72,9 +84,8 @@ export class ScanQrComponent {
         this.message = '✅ Visage reconnu. Validation de présence...';
       }
 
-      // 3. Valider la présence via le token du QR
       await this.http
-        .post(`${this.BASE_URL}/qrcode/${this.tokenQr}/scan`, { empreinte_device: "fallback-device" }, { headers })
+        .post(`${this.BASE_URL}/qrcode/${this.tokenQr}/scan`, { empreinte_device: "fallback-device", descriptor }, { headers })
         .toPromise();
 
       this.message = '✅ Présence validée avec succès !';
