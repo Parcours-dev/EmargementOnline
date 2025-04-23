@@ -61,6 +61,7 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
 
   async captureAndEmit() {
     const video = this.videoRef.nativeElement;
+    console.log('📸 Bouton cliqué, capture en cours...');
 
     const result = await faceapi
       .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
