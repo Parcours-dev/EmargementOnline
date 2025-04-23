@@ -25,12 +25,15 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
   modelsLoaded = false;
   isScanning = false;
 
+  // Pour le style dynamique du message
+  messageType: 'info' | 'success' | 'error' = 'info';
+
   ngOnInit() {
     this.loadModels();
   }
 
   async loadModels() {
-    this.message = '📦 Chargement des modèles...';
+    this.setMessage('📦 Chargement des modèles...', 'info');
     try {
       await Promise.all([
         faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/models/ssd_mobilenetv1'),
@@ -38,10 +41,10 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
         faceapi.nets.faceRecognitionNet.loadFromUri('/assets/models/face_recognition'),
       ]);
       this.modelsLoaded = true;
-      this.message = '📸 Modèles chargés. Initialisation caméra...';
+      this.setMessage('📸 Modèles chargés. Initialisation caméra...', 'success');
       console.log("✅ Tous les modèles ont bien été chargés !");
     } catch (e) {
-      this.message = '❌ Erreur lors du chargement des modèles';
+      this.setMessage('❌ Erreur lors du chargement des modèles', 'error');
       console.error('❌ Erreur face-api model:', e);
     }
   }
@@ -55,21 +58,19 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       this.videoRef.nativeElement.srcObject = stream;
-      this.message = '🎥 Caméra active. Appuyez pour capturer.';
+      this.setMessage('🎥 Caméra active. Appuyez pour capturer.', 'info');
       console.log('✅ Caméra initialisée avec succès');
     } catch (err) {
-      this.message = '❌ Impossible d’accéder à la caméra';
+      this.setMessage('❌ Impossible d’accéder à la caméra', 'error');
       console.error('❌ Erreur accès caméra :', err);
     }
   }
 
   async captureAndEmit() {
-    if (!this.modelsLoaded || this.isScanning) {
-      return;
-    }
+    if (!this.modelsLoaded || this.isScanning) return;
 
     this.isScanning = true;
-    this.message = '🔍 Analyse du visage en cours...';
+    this.setMessage('🔍 Analyse du visage en cours...', 'info');
 
     const video = this.videoRef.nativeElement;
 
@@ -80,25 +81,30 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
         .withFaceDescriptor();
 
       if (!result || !result.descriptor) {
-        this.message = '😕 Visage non détecté. Vérifiez l’éclairage ou ajustez votre position.';
+        this.setMessage('😕 Visage non détecté. Vérifiez l’éclairage ou ajustez votre position.', 'error');
         console.warn('😕 Aucun visage détecté.');
         return;
       }
 
       const descriptorArray = Array.from(result.descriptor);
-      this.message = '✅ Visage capturé. Envoi au parent...';
+      this.setMessage('✅ Visage capturé. Envoi au parent...', 'success');
       console.log('📤 Descripteur envoyé au parent :', descriptorArray);
 
       this.faceVerified.emit(descriptorArray);
 
       setTimeout(() => {
-        this.message = '🎥 Caméra active. Vous pouvez rescanner.';
+        this.setMessage('🎥 Caméra active. Vous pouvez rescanner.', 'info');
       }, 3000);
     } catch (e) {
-      this.message = '❌ Erreur lors de la capture du visage.';
+      this.setMessage('❌ Erreur lors de la capture du visage.', 'error');
       console.error(e);
     } finally {
       this.isScanning = false;
     }
+  }
+
+  private setMessage(msg: string, type: 'info' | 'success' | 'error') {
+    this.message = msg;
+    this.messageType = type;
   }
 }

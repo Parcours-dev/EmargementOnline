@@ -43,22 +43,37 @@ video {
 /* Masque ovale clair */
 .oval-mask {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  border: 3px solid rgba(0, 132, 255, 0.5);
+  top: 50%;
+  left: 50%;
+  width: 60%;
+  height: 70%;
+  transform: translate(-50%, -50%);
+  border: 3px solid rgba(0, 132, 255, 0.6);
   border-radius: 50% / 60%;
   box-sizing: border-box;
-  margin: auto;
+  pointer-events: none;
 }
 
 /* Instruction texte */
 .instruction {
   margin-top: 1rem;
   font-size: 1rem;
+  text-align: center;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+/* Couleurs dynamiques pour messages */
+.instruction.info {
   color: #444;
+}
+
+.instruction.success {
+  color: #28a745;
+}
+
+.instruction.error {
+  color: #dc3545;
 }
 
 /* Bouton scan */
@@ -72,6 +87,10 @@ video {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+.capture-btn:hover {
+  background-color: #1976d2;
 }
 
 .capture-btn:disabled {
