@@ -22,6 +22,7 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
 
   message = 'Chargement...';
   modelsLoaded = false;
+  isScanning = false;
 
   ngOnInit() {
     this.loadModels();
@@ -35,7 +36,7 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
         faceapi.nets.faceLandmark68Net.loadFromUri('/assets/models/face_landmark_68'),
         faceapi.nets.faceRecognitionNet.loadFromUri('/assets/models/face_recognition'),
       ]);
-      this.modelsLoaded = true; // ✅ Active le bouton
+      this.modelsLoaded = true;
       this.message = '📸 Modèles chargés. Initialisation caméra...';
       console.log("✅ Tous les modèles ont bien été chargés !");
     } catch (e) {
@@ -62,30 +63,41 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
   }
 
   async captureAndEmit() {
-    if (!this.modelsLoaded) {
-      this.message = '⏳ Patientez, chargement des modèles...';
-      console.warn('⛔️ Tentative de scan avant chargement des modèles.');
+    if (!this.modelsLoaded || this.isScanning) {
       return;
     }
+
+    this.isScanning = true;
+    this.message = '🔍 Analyse du visage en cours...';
 
     const video = this.videoRef.nativeElement;
-    console.log('📸 Bouton cliqué, capture en cours...');
 
-    const result = await faceapi
-      .detectSingleFace(video, new faceapi.SsdMobilenetv1Options())
-      .withFaceLandmarks()
-      .withFaceDescriptor();
+    try {
+      const result = await faceapi
+        .detectSingleFace(video, new faceapi.SsdMobilenetv1Options())
+        .withFaceLandmarks()
+        .withFaceDescriptor();
 
-    if (!result || !result.descriptor) {
-      this.message = '😕 Visage non détecté. Réessayez.';
-      console.warn('😕 Aucun visage détecté.');
-      return;
+      if (!result || !result.descriptor) {
+        this.message = '😕 Visage non détecté. Vérifiez l’éclairage ou ajustez votre position.';
+        console.warn('😕 Aucun visage détecté.');
+        return;
+      }
+
+      const descriptorArray = Array.from(result.descriptor);
+      this.message = '✅ Visage capturé. Envoi au parent...';
+      console.log('📤 Descripteur envoyé au parent :', descriptorArray);
+
+      this.faceVerified.emit(descriptorArray);
+
+      setTimeout(() => {
+        this.message = '🎥 Caméra active. Vous pouvez rescanner.';
+      }, 3000);
+    } catch (e) {
+      this.message = '❌ Erreur lors de la capture du visage.';
+      console.error(e);
+    } finally {
+      this.isScanning = false;
     }
-
-    const descriptorArray = Array.from(result.descriptor);
-    this.message = '✅ Visage capturé. Envoi au parent...';
-    console.log('📤 Descripteur envoyé au parent :', descriptorArray);
-
-    this.faceVerified.emit(descriptorArray);
   }
 }

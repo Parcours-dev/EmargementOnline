@@ -1,3 +1,8 @@
-<video #video autoplay muted playsinline width="300"></video>
-<button [disabled]="!modelsLoaded" (click)="captureAndEmit()">📸 Scanner visage</button>
-<p>{{ message }}</p>
+<div class="scan-container">
+  <div class="video-wrapper">
+    <video #video autoplay muted playsinline></video>
+    <div class="overlay-mask"></div>
+  </div>
+  <p class="instruction">{{ message }}</p>
+  <button class="capture-btn" (click)="captureAndEmit()" [disabled]="!modelsLoaded">📸 Scanner visage</button>
+</div>
