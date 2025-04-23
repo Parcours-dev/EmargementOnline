@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { HeaderComponent } from "../../core/header/header.component";
 import { FooterComponent } from "../../core/footer/footer.component";
 import { ParametresLoginFactory } from "../../../shared/modeles/ParametresLogin";
@@ -6,8 +6,13 @@ import { LoginService } from "../../../shared/services/LoginService";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormControl } from "@angular/forms";
 import { RetourLogin, RetourLoginFactory } from "../../../shared/modeles/RetourLogin";
-import { Router } from "@angular/router";
-import { DASHBOARD_CFA, DASHBOARD_ETUDIANT, DASHBOARD_PROFESSEUR } from "../../../shared/constantes/liens.const";
+import { Router, ActivatedRoute } from "@angular/router";
+import {
+  DASHBOARD_CFA,
+  DASHBOARD_ETUDIANT,
+  DASHBOARD_PROFESSEUR,
+  ACCUEIL
+} from "../../../shared/constantes/liens.const";
 
 @Component({
   selector: "app-accueil",
@@ -15,7 +20,7 @@ import { DASHBOARD_CFA, DASHBOARD_ETUDIANT, DASHBOARD_PROFESSEUR } from "../../.
   imports: [HeaderComponent, FooterComponent, CommonModule, ReactiveFormsModule],
   templateUrl: "./accueil.component.html",
 })
-export class AccueilComponent {
+export class AccueilComponent implements OnInit {
 
   private readonly CHAMP_EMAIL = 'email';
   private readonly CHAMP_MDP = 'password';
@@ -25,14 +30,26 @@ export class AccueilComponent {
 
   retourLogin: RetourLogin = RetourLoginFactory();
 
+  formulaireConnexionUtilisateur: FormGroup;
+
   private readonly serviceLogin = inject(LoginService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
-  formulaireConnexionUtilisateur: FormGroup = this.formBuilder.group({
-    email: [''],
-    password: ['']
-  });
+  private redirectUrl: string | null = null;
+
+  constructor() {
+    this.formulaireConnexionUtilisateur = this.formBuilder.group({
+      email: [''],
+      password: ['']
+    });
+  }
+
+  ngOnInit(): void {
+    // 🔄 Capture du paramètre redirect
+    this.redirectUrl = this.route.snapshot.queryParamMap.get('redirect');
+  }
 
   get emailControl(): FormControl {
     return this.formulaireConnexionUtilisateur.get(this.CHAMP_EMAIL) as FormControl;
@@ -50,27 +67,31 @@ export class AccueilComponent {
 
     this.serviceLogin.connecterUtilisateur(parametresLogin).subscribe({
       next: retourLogin => {
-        // ✅ On utilise localStorage pour être en cohérence avec le header
         localStorage.setItem('_TOKEN_UTILISATEUR', JSON.stringify({ token: retourLogin.token }));
         localStorage.setItem('_INFOS_UTILISATEUR', JSON.stringify(retourLogin));
         this.gererCasSucces(retourLogin);
       },
       error: err => {
-        // ❌ Gère l’erreur de login ici (affichage message, redirection, etc.)
         console.error('Erreur de connexion :', err);
       },
     });
   }
 
   private gererCasSucces(retourLogin: RetourLogin) {
-    if (retourLogin.role == this.ROLE_ETUDIANT) {
-      this.router.navigateByUrl(`${DASHBOARD_ETUDIANT}`);
+    if (this.redirectUrl) {
+      // ✅ Si redirection présente, on l'utilise
+      this.router.navigateByUrl(this.redirectUrl);
+      return;
     }
-    if (retourLogin.role == this.ROLE_CFA) {
-      this.router.navigateByUrl(`${DASHBOARD_CFA}`);
-    }
-    if (retourLogin.role == this.ROLE_PROFESSEUR) {
-      this.router.navigateByUrl(`${DASHBOARD_PROFESSEUR}`);
+
+    if (retourLogin.role === this.ROLE_ETUDIANT) {
+      this.router.navigateByUrl(DASHBOARD_ETUDIANT);
+    } else if (retourLogin.role === this.ROLE_CFA) {
+      this.router.navigateByUrl(DASHBOARD_CFA);
+    } else if (retourLogin.role === this.ROLE_PROFESSEUR) {
+      this.router.navigateByUrl(DASHBOARD_PROFESSEUR);
+    } else {
+      this.router.navigateByUrl(ACCUEIL);
     }
   }
 }

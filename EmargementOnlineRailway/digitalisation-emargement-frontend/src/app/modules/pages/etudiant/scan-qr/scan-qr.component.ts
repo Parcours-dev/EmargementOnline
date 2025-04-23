@@ -16,7 +16,11 @@ export class ScanQrComponent {
 
   private readonly BASE_URL = 'https://emargementonline-production.up.railway.app/api';
 
-  constructor(private route: ActivatedRoute, private http: HttpClient, private router: Router) {
+  constructor(
+    private route: ActivatedRoute,
+    private http: HttpClient,
+    private router: Router
+  ) {
     this.tokenQr = this.route.snapshot.paramMap.get('token') || '';
   }
 
@@ -33,27 +37,32 @@ export class ScanQrComponent {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     try {
-      // 1. Vérifie si une photo de référence existe
-      const { exists } = await this.http
+      // 1. Vérifier si une photo de référence existe
+      const existsResponse = await this.http
         .get<{ exists: boolean }>(`${this.BASE_URL}/etudiants/photo-reference`, { headers })
         .toPromise();
 
+      const exists = existsResponse?.exists ?? false;
+
       if (!exists) {
         this.message = '📸 Enregistrement photo de référence...';
+
         await this.http
           .post(`${this.BASE_URL}/etudiants/face-reference`, { descriptor }, { headers })
           .toPromise();
 
         this.message = '✅ Référence enregistrée. Validation de présence...';
       } else {
-        // 2. Sinon → vérifier que ça matche
-        const { match } = await this.http
+        // 2. Comparaison avec référence
+        const matchResponse = await this.http
           .post<{ match: boolean }>(
             `${this.BASE_URL}/etudiants/face-verify`,
             { descriptor },
             { headers }
           )
           .toPromise();
+
+        const match = matchResponse?.match ?? false;
 
         if (!match) {
           this.message = '❌ Reconnaissance faciale échouée';
@@ -63,8 +72,8 @@ export class ScanQrComponent {
         this.message = '✅ Visage reconnu. Validation de présence...';
       }
 
-      // 3. Valider présence via QR token
-      const result = await this.http
+      // 3. Valider la présence via le token du QR
+      await this.http
         .post(`${this.BASE_URL}/etudiants/valider-qr/${this.tokenQr}`, {}, { headers })
         .toPromise();
 
