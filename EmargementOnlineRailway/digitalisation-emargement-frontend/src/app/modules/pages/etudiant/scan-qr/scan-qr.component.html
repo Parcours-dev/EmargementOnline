@@ -3,9 +3,10 @@
     🧠 Une photo de référence est déjà enregistrée. Vous allez être comparé à celle-ci.
   </p>
   <ng-template #noRef>
-    📸 Aucune photo de référence trouvée. La première capture sera enregistrée comme référence.
+    <p>📸 Aucune photo de référence trouvée. La première capture sera enregistrée comme référence.</p>
   </ng-template>
 </div>
 
 <app-face-scan (faceVerified)="onFaceVerified($event)"></app-face-scan>
-<p class="instruction-message">{{ message }}</p>
+
+<p class="instruction-message" [ngClass]="messageType">{{ message }}</p>
