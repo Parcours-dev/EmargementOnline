@@ -21,7 +21,7 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
   @Output() faceVerified = new EventEmitter<number[]>();
 
   message = 'Chargement...';
-  modelsLoaded = false; // ✅ état de chargement des modèles
+  modelsLoaded = false;
 
   ngOnInit() {
     this.loadModels();
@@ -31,17 +31,20 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
     this.message = '📦 Chargement des modèles...';
     const MODEL_URL = '/assets/models';
 
+    console.log('⏳ Début du chargement des modèles depuis :', MODEL_URL);
+
     try {
       await Promise.all([
-        faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
-        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+        faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL).then(() => console.log('✅ ssdMobilenetv1 chargé')),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL).then(() => console.log('✅ faceLandmark68Net chargé')),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL).then(() => console.log('✅ faceRecognitionNet chargé')),
       ]);
-      this.modelsLoaded = true; // ✅ flag à true
+      this.modelsLoaded = true;
       this.message = '📸 Modèles chargés. Initialisation caméra...';
+      console.log('✅ Tous les modèles sont chargés !');
     } catch (e) {
       this.message = '❌ Erreur chargement modèles';
-      console.error(e);
+      console.error('❌ Erreur lors du chargement des modèles :', e);
     }
   }
 
@@ -50,19 +53,22 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
   }
 
   async initCamera() {
+    console.log('🎥 Initialisation de la caméra...');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       this.videoRef.nativeElement.srcObject = stream;
       this.message = '🎥 Caméra active. Appuyez pour capturer.';
+      console.log('✅ Caméra initialisée avec succès');
     } catch (err) {
       this.message = '❌ Impossible d’accéder à la caméra';
-      console.error(err);
+      console.error('❌ Erreur accès caméra :', err);
     }
   }
 
   async captureAndEmit() {
     if (!this.modelsLoaded) {
       this.message = '⏳ Patientez, chargement des modèles...';
+      console.warn('⛔️ Tentative de scan avant chargement des modèles.');
       return;
     }
 
@@ -76,11 +82,13 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
 
     if (!result || !result.descriptor) {
       this.message = '😕 Visage non détecté. Réessayez.';
+      console.warn('😕 Aucun visage détecté.');
       return;
     }
 
     const descriptorArray = Array.from(result.descriptor);
     this.message = '✅ Visage capturé. Envoi au parent...';
+    console.log('📤 Descripteur envoyé au parent :', descriptorArray);
 
     this.faceVerified.emit(descriptorArray);
   }
