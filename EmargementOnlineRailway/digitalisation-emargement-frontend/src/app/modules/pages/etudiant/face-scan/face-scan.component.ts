@@ -29,22 +29,17 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
 
   async loadModels() {
     this.message = '📦 Chargement des modèles...';
-    const MODEL_URL = '/assets/models';
-
-    console.log('⏳ Début du chargement des modèles depuis :', MODEL_URL);
-
     try {
       await Promise.all([
-        faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL).then(() => console.log('✅ ssdMobilenetv1 chargé')),
-        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL).then(() => console.log('✅ faceLandmark68Net chargé')),
-        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL).then(() => console.log('✅ faceRecognitionNet chargé')),
+        faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/models/ssd_mobilenetv1'),
+        faceapi.nets.faceLandmark68Net.loadFromUri('/assets/models/face_landmark_68'),
+        faceapi.nets.faceRecognitionNet.loadFromUri('/assets/models/face_recognition'),
       ]);
-      this.modelsLoaded = true;
       this.message = '📸 Modèles chargés. Initialisation caméra...';
-      console.log('✅ Tous les modèles sont chargés !');
+      console.log("✅ Tous les modèles ont bien été chargés !");
     } catch (e) {
-      this.message = '❌ Erreur chargement modèles';
-      console.error('❌ Erreur lors du chargement des modèles :', e);
+      this.message = '❌ Erreur lors du chargement des modèles';
+      console.error('❌ Erreur face-api model:', e);
     }
   }
 
