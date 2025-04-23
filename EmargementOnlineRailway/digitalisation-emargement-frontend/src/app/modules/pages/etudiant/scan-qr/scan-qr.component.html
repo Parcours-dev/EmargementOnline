@@ -1,23 +1,12 @@
-<div class="scan-page">
-  <!-- État de la photo de référence -->
-  <div class="reference-status" *ngIf="hasReference !== null">
-    <p *ngIf="hasReference; else noRef">
-      🧠 Une photo de référence est déjà enregistrée.<br />
-      Vous allez être comparé à celle-ci.
-    </p>
-    <ng-template #noRef>
-      <p>📸 Aucune photo de référence trouvée.<br />La première capture sera enregistrée comme référence.</p>
-    </ng-template>
-  </div>
-  <!-- Composant de scan facial -->
-  <app-face-scan
-    [statusMessage]="message"
-    [messageType]="messageType"
-    (faceVerified)="onFaceVerified($event)">
-  </app-face-scan>
-
-  <!-- Message d’état final (présence, erreur, etc.) -->
-  <p class="instruction-message" [ngClass]="messageType">
-    {{ message }}
+<div class="reference-status" *ngIf="hasReference !== null">
+  <p *ngIf="hasReference; else noRef">
+    🧠 Une photo de référence est déjà enregistrée. Vous allez être comparé à celle-ci.
   </p>
+  <ng-template #noRef>
+    <p>📸 Aucune photo de référence trouvée. La première capture sera enregistrée comme référence.</p>
+  </ng-template>
 </div>
+
+<app-face-scan (faceVerified)="onFaceVerified($event)"></app-face-scan>
+
+<p class="instruction-message" [ngClass]="messageType">{{ message }}</p>

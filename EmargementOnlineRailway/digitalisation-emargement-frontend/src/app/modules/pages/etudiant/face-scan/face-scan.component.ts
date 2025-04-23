@@ -5,8 +5,7 @@ import {
   ViewChild,
   AfterViewInit,
   Output,
-  EventEmitter,
-  Input
+  EventEmitter
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as faceapi from 'face-api.js';
@@ -22,9 +21,8 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
   @ViewChild('video') videoRef!: ElementRef<HTMLVideoElement>;
   @Output() faceVerified = new EventEmitter<number[]>();
 
-  @Input() statusMessage: string = '';
-  @Input() messageType: 'info' | 'success' | 'error' = 'info';
-
+  message = 'Chargement...';
+  hasReference = false;
   modelsLoaded = false;
   isScanning = false;
 
@@ -33,6 +31,7 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
   }
 
   async loadModels() {
+    this.message = '📦 Chargement des modèles...';
     try {
       await Promise.all([
         faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/models/ssd_mobilenetv1'),
@@ -40,8 +39,10 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
         faceapi.nets.faceRecognitionNet.loadFromUri('/assets/models/face_recognition'),
       ]);
       this.modelsLoaded = true;
+      this.message = '📸 Modèles chargés. Initialisation caméra...';
       console.log("✅ Tous les modèles ont bien été chargés !");
     } catch (e) {
+      this.message = '❌ Erreur lors du chargement des modèles';
       console.error('❌ Erreur face-api model:', e);
     }
   }
@@ -55,8 +56,10 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       this.videoRef.nativeElement.srcObject = stream;
+      this.message = '🎥 Caméra active. Vous pouvez rescanner.';
       console.log('✅ Caméra initialisée avec succès');
     } catch (err) {
+      this.message = '❌ Impossible d’accéder à la caméra';
       console.error('❌ Erreur accès caméra :', err);
     }
   }
@@ -65,6 +68,7 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
     if (!this.modelsLoaded || this.isScanning) return;
 
     this.isScanning = true;
+    this.message = '🔍 Analyse du visage en cours...';
 
     const video = this.videoRef.nativeElement;
     try {
@@ -74,17 +78,23 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
         .withFaceDescriptor();
 
       if (!result || !result.descriptor) {
+        this.message = '😕 Visage non détecté. Vérifiez l’éclairage ou ajustez votre position.';
         console.warn('😕 Aucun visage détecté.');
-        this.faceVerified.emit([]); // On peut éventuellement signaler une erreur
         return;
       }
 
       const descriptorArray = Array.from(result.descriptor);
+      this.message = '✅ Visage capturé. Vérification en cours...';
+
       this.faceVerified.emit(descriptorArray);
 
+      setTimeout(() => {
+        this.message = '🎥 Caméra active. Vous pouvez rescanner.';
+      }, 4000);
+
     } catch (e) {
-      console.error('❌ Erreur pendant la capture.', e);
-      this.faceVerified.emit([]); // Emit vide pour indiquer l’échec
+      this.message = '❌ Erreur pendant la capture.';
+      console.error(e);
     } finally {
       this.isScanning = false;
     }

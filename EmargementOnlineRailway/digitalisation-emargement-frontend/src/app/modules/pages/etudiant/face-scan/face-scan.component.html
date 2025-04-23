@@ -1,6 +1,6 @@
 <div class="scan-page">
-  <div *ngIf="statusMessage" class="status-message">
-    {{ statusMessage }}
+  <div *ngIf="message" class="status-message">
+    {{ message }}
   </div>
 
   <div class="video-container">
@@ -8,7 +8,6 @@
       <video #video autoplay muted playsinline></video>
       <div class="oval-mask"></div>
     </div>
-
 
     <button class="capture-btn" (click)="captureAndEmit()" [disabled]="!modelsLoaded || isScanning">
       📸 Scanner visage

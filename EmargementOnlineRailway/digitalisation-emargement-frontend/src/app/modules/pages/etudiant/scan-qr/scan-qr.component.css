@@ -1,35 +1,18 @@
-/* Conteneur principal */
-.scan-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  font-family: 'Inter', sans-serif;
-  min-height: 100vh;
-  padding: 2rem 1rem;
-  background-color: #f9f9f9;
-  gap: 1.5rem;
-}
-
 /* Zone d’info sur la référence */
 .reference-status {
   max-width: 500px;
-  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.25rem;
   background-color: #e9f5ff;
   border-left: 4px solid #2196f3;
   border-radius: 0.5rem;
-  padding: 0.75rem 1.25rem;
   font-size: 1rem;
   color: #0c4a6e;
-  text-align: center;
-  line-height: 1.5;
 }
 
 /* Message principal */
 .instruction-message {
-  max-width: 500px;
-  width: 100%;
-  margin-top: 1rem;
+  margin-top: 2rem;
   font-size: 1.1rem;
   font-weight: 500;
   text-align: center;
