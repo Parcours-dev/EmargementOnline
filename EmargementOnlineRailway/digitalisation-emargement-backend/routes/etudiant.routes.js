@@ -86,10 +86,20 @@ router.get("/etudiants/mes-presences", verifyToken, checkRole("etudiant"), getCo
  *                 exists:
  *                   type: boolean
  */
-router.get("/etudiants/photo-reference", verifyToken, checkRole("etudiant"), (req, res) => {
-    const filePath = path.join(__dirname, `../uploads/references/${req.user.id}.jpg`);
-    const exists = fs.existsSync(filePath);
-    return res.json({ exists });
+router.get("/etudiants/photo-reference", verifyToken, checkRole("etudiant"), async (req, res) => {
+    try {
+        const [[etudiant]] = await db.query(
+            `SELECT face_descriptor FROM etudiant WHERE NEtudiant = ?`,
+            [req.user.id]
+        );
+
+        const exists = !!etudiant && !!etudiant.face_descriptor && etudiant.face_descriptor !== "[]";
+
+        return res.json({ exists });
+    } catch (err) {
+        console.error("❌ Erreur vérification référence:", err);
+        res.status(500).json({ exists: false });
+    }
 });
 
 // ===========================================
