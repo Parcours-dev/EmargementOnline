@@ -74,7 +74,7 @@ export class ScanQrComponent {
 
       // 3. Valider la présence via le token du QR
       await this.http
-        .post(`${this.BASE_URL}/etudiants/valider-qr/${this.tokenQr}`, {}, { headers })
+        .post(`${this.BASE_URL}/qrcode/${this.tokenQr}/scan`, { empreinte_device: "fallback-device" }, { headers })
         .toPromise();
 
       this.message = '✅ Présence validée avec succès !';
