@@ -4,25 +4,24 @@
   flex-direction: column;
   align-items: center;
   font-family: 'Inter', 'Helvetica', sans-serif;
-  padding: 2rem;
+  padding: 1.5rem 1rem;
   min-height: 100vh;
   background-color: #f9f9f9;
+  max-width: 480px;
+  margin: auto;
 }
 
-/* Titre */
-.title {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
-}
-
-/* Message de statut */
-.status-message {
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  color: #333;
+/* Zone info référence */
+.reference-status {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background-color: #e9f5ff;
+  border-left: 4px solid #2196f3;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  color: #0c4a6e;
+  box-sizing: border-box;
 }
 
 /* Conteneur vidéo */
@@ -30,13 +29,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.75rem;
+  width: 100%;
 }
 
-/* Conteneur vidéo avec masque */
+/* Cadre vidéo */
 .video-frame {
   position: relative;
-  width: 320px;
-  height: 420px;
+  width: 100%;
+  max-width: 320px;
+  height: 400px;
   border-radius: 1rem;
   overflow: hidden;
   background: #000;
@@ -49,7 +51,7 @@ video {
   object-fit: cover;
 }
 
-/* Masque ovale clair */
+/* Masque ovale */
 .oval-mask {
   position: absolute;
   top: 50%;
@@ -57,45 +59,48 @@ video {
   width: 60%;
   height: 70%;
   transform: translate(-50%, -50%);
-  border: 3px solid rgba(0, 132, 255, 0.6);
+  border: 3px solid rgba(0, 132, 255, 0.5);
   border-radius: 50% / 60%;
-  box-sizing: border-box;
   pointer-events: none;
+  box-sizing: border-box;
 }
 
-/* Instruction texte (optionnel) */
-.instruction {
+/* Message dynamique */
+.instruction-message,
+.status-message {
   margin-top: 1rem;
-  font-size: 1rem;
   text-align: center;
   font-weight: 500;
-  transition: color 0.3s;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
+  padding: 0 1rem;
 }
 
-/* Couleurs dynamiques pour messages */
-.instruction.info {
-  color: #444;
-}
-
-.instruction.success {
+.instruction-message.success {
   color: #28a745;
 }
 
-.instruction.error {
+.instruction-message.error {
   color: #dc3545;
 }
 
-/* Bouton scan */
+.instruction-message.info {
+  color: #444;
+}
+
+/* Bouton scanner */
 .capture-btn {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   background-color: #2196f3;
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 9999px;
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  width: 100%;
+  max-width: 220px;
 }
 
 .capture-btn:hover {
@@ -107,12 +112,12 @@ video {
   cursor: not-allowed;
 }
 
-/* Bouton retour */
+/* Bouton retour (si utilisé plus tard) */
 .return-btn {
   margin-top: 1rem;
   background: transparent;
   color: #444;
-  font-size: 1rem;
+  font-size: 0.95rem;
   border: none;
   cursor: pointer;
   text-decoration: underline;
