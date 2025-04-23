@@ -15,6 +15,7 @@ import * as faceapi from 'face-api.js';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './face-scan.component.html',
+  styleUrls: ['./face-scan.component.css'],
 })
 export class FaceScanComponent implements OnInit, AfterViewInit {
   @ViewChild('video') videoRef!: ElementRef<HTMLVideoElement>;
