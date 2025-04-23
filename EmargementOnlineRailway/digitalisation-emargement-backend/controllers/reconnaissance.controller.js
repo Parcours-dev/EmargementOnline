@@ -1,6 +1,5 @@
 const db = require('../config/db');
 
-// 🔢 Helper : Calcule la distance euclidienne entre deux vecteurs
 function distanceEuclidienne(v1, v2) {
     let sum = 0;
     for (let i = 0; i < v1.length; i++) {
@@ -10,7 +9,6 @@ function distanceEuclidienne(v1, v2) {
     return Math.sqrt(sum);
 }
 
-// ✅ Enregistrement du descripteur facial de référence
 exports.enregistrerPhotoReference = async (req, res) => {
     const { descriptor } = req.body;
     const idEtudiant = req.user.id;
@@ -31,7 +29,6 @@ exports.enregistrerPhotoReference = async (req, res) => {
     }
 };
 
-// ✅ Vérification du visage par rapport à la référence
 exports.verifierVisage = async (req, res) => {
     const { descriptor } = req.body;
     const idEtudiant = req.user.id;

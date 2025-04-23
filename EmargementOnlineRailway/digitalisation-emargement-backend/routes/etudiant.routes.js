@@ -8,10 +8,9 @@ const { getEtudiantInfo } = require("../controllers/etudiant.controller");
 const { verifyToken } = require("../middleware/auth.middleware");
 const { checkRole } = require("../middleware/checkRole");
 const { getCoursEtudiant } = require("../controllers/presence.controller");
-const { getQrCodeActif } = require("../controllers/qrcode.controller");
 const {
     enregistrerPhotoReference,
-    verifierVisage,
+    verifierVisage
 } = require("../controllers/reconnaissance.controller");
 
 /**
@@ -22,7 +21,7 @@ const {
  */
 
 // ======================
-// 📌 Middleware d'upload
+// 📌 Middleware d'upload (non utilisé ici)
 // ======================
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -66,37 +65,9 @@ router.get("/etudiants/me", verifyToken, checkRole("etudiant"), getEtudiantInfo)
  */
 router.get("/etudiants/mes-presences", verifyToken, checkRole("etudiant"), getCoursEtudiant);
 
-// =============================================
-// ✅ Nouvelle Route : Upload photo de référence
-// =============================================
-/**
- * @swagger
- * /api/etudiants/photo-reference:
- *   post:
- *     summary: Upload de la photo de référence de l'étudiant
- *     tags: [Étudiant]
- *     security: [ { bearerAuth: [] } ]
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               photo:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Photo enregistrée
- *       400:
- *         description: Erreur lors de l'enregistrement
- */
-router.post("/etudiants/photo-reference", verifyToken, checkRole("etudiant"), upload.single("photo"), enregistrerPhotoReference);
-
-// =====================================================
-// ✅ Nouvelle Route : Vérifie si la photo de référence existe
-// =====================================================
+// =========================================
+// ✅ Route : Vérifie si une photo est dispo
+// =========================================
 /**
  * @swagger
  * /api/etudiants/photo-reference:
@@ -121,9 +92,67 @@ router.get("/etudiants/photo-reference", verifyToken, checkRole("etudiant"), (re
     return res.json({ exists });
 });
 
-// =====================================
-// ✅ Route : Vérification reconnaissance
-// =====================================
-router.post("/etudiants/verifier-visage", verifyToken, checkRole("etudiant"), verifierVisage);
+// ===========================================
+// ✅ Route : Enregistrement du descripteur
+// ===========================================
+/**
+ * @swagger
+ * /api/etudiants/face-reference:
+ *   post:
+ *     summary: Enregistre le descripteur facial comme référence
+ *     tags: [Étudiant]
+ *     security: [ { bearerAuth: [] } ]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               descriptor:
+ *                 type: array
+ *                 items:
+ *                   type: number
+ *     responses:
+ *       200:
+ *         description: Signature enregistrée
+ *       400:
+ *         description: Format incorrect
+ */
+router.post("/etudiants/face-reference", verifyToken, checkRole("etudiant"), enregistrerPhotoReference);
+
+// =============================================
+// ✅ Route : Vérification du descripteur facial
+// =============================================
+/**
+ * @swagger
+ * /api/etudiants/face-verify:
+ *   post:
+ *     summary: Vérifie la similarité entre visage scanné et référence
+ *     tags: [Étudiant]
+ *     security: [ { bearerAuth: [] } ]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               descriptor:
+ *                 type: array
+ *                 items:
+ *                   type: number
+ *     responses:
+ *       200:
+ *         description: Résultat de la vérification
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 match:
+ *                   type: boolean
+ */
+router.post("/etudiants/face-verify", verifyToken, checkRole("etudiant"), verifierVisage);
 
 module.exports = router;
