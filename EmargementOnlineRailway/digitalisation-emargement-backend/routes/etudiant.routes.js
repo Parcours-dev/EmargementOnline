@@ -87,20 +87,43 @@ router.get("/etudiants/mes-presences", verifyToken, checkRole("etudiant"), getCo
  *                   type: boolean
  */
 router.get("/etudiants/photo-reference", verifyToken, checkRole("etudiant"), async (req, res) => {
+    const idEtudiant = req.user.id;
+    console.log("📩 Vérification de la photo de référence pour l'étudiant :", idEtudiant);
+
     try {
         const [[etudiant]] = await db.query(
             `SELECT face_descriptor FROM etudiant WHERE NEtudiant = ?`,
-            [req.user.id]
+            [idEtudiant]
         );
 
-        const exists = !!etudiant && !!etudiant.face_descriptor && etudiant.face_descriptor !== "[]";
+        if (!etudiant || !etudiant.face_descriptor) {
+            console.log("📭 Aucun visage trouvé (champ null ou étudiant introuvable)");
+            return res.json({ exists: false });
+        }
 
-        return res.json({ exists });
+        let descriptor;
+        try {
+            descriptor = JSON.parse(etudiant.face_descriptor);
+        } catch (err) {
+            console.error("❌ Erreur parsing JSON du descripteur :", err);
+            return res.json({ exists: false });
+        }
+
+        const isValid = Array.isArray(descriptor) && descriptor.length === 128;
+
+        if (isValid) {
+            console.log("✅ Visage trouvé en base et valide (128 points)");
+        } else {
+            console.warn("⚠️ Visage trouvé mais invalide (longueur :", descriptor.length, ")");
+        }
+
+        return res.json({ exists: isValid });
     } catch (err) {
-        console.error("❌ Erreur vérification référence:", err);
-        res.status(500).json({ exists: false });
+        console.error("❌ Erreur lors de la récupération du visage :", err);
+        return res.status(500).json({ exists: false });
     }
 });
+
 
 // ===========================================
 // ✅ Route : Enregistrement du descripteur
