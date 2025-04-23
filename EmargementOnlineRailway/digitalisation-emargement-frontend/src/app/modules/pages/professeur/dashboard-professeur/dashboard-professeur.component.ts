@@ -133,11 +133,12 @@ export class DashBoardProfesseurComponent implements OnInit {
     const idGroupe = cours.id_groupe;
     const idProf = cours.id_professeur;
 
+    // 💡 Retirer 2h à l’heure locale pour coller avec l’heure UTC stockée en DB
     const localDate = new Date(cours.date_heure_debut);
-    const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
-    const formattedDateUTC = formatDate(utcDate, 'yyyy-MM-dd HH:mm:ss', 'en-US');
+    const utcMinus2h = new Date(localDate.getTime() - 2 * 60 * 60 * 1000); // ⏱️ -2h
+    const formattedDate = formatDate(utcMinus2h, 'yyyy-MM-dd HH:mm:ss', 'fr-FR');
 
-    const identifiant = `${idCours}-${idGroupe}-${idProf}-${formattedDateUTC}`;
+    const identifiant = `${idCours}-${idGroupe}-${idProf}-${formattedDate}`;
     const encodedId = encodeURIComponent(identifiant);
 
     window.open(
@@ -146,4 +147,5 @@ export class DashBoardProfesseurComponent implements OnInit {
       'width=420,height=500'
     );
   }
+
 }
