@@ -16,6 +16,15 @@
   margin-bottom: 2rem;
 }
 
+/* Message de statut */
+.status-message {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #333;
+}
+
 /* Conteneur vidéo */
 .video-container {
   display: flex;
@@ -54,7 +63,7 @@ video {
   pointer-events: none;
 }
 
-/* Instruction texte */
+/* Instruction texte (optionnel) */
 .instruction {
   margin-top: 1rem;
   font-size: 1rem;

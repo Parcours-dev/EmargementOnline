@@ -1,15 +1,16 @@
-<div class="scan-container">
-  <div class="video-frame">
-    <video #video autoplay muted playsinline></video>
-    <div class="oval-mask"></div>
+<div class="scan-page">
+  <div *ngIf="message" class="status-message">
+    {{ message }}
   </div>
 
+  <div class="video-container">
+    <div class="video-frame">
+      <video #video autoplay muted playsinline></video>
+      <div class="oval-mask"></div>
+    </div>
 
-  <p class="instruction" [ngClass]="messageType">{{ message }}</p>
-
-  <button class="capture-btn" (click)="captureAndEmit()" [disabled]="!modelsLoaded || isScanning">
-    📸 Scanner visage
-  </button>
-
-
+    <button class="capture-btn" (click)="captureAndEmit()" [disabled]="!modelsLoaded || isScanning">
+      📸 Scanner visage
+    </button>
+  </div>
 </div>
