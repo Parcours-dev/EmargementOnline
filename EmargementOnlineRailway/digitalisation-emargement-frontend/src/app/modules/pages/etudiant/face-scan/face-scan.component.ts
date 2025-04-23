@@ -28,14 +28,13 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
 
   async loadModels() {
     this.message = '📦 Chargement des modèles...';
-    const MODEL_URL = '/models';
+    const MODEL_URL = '/assets/models'; // ✅ chemin correct
 
     try {
       await Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-        // ❌ pas de TinyYolov2 ici !
+        faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),      // ✅ détection du visage
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),   // ✅ points du visage
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),  // ✅ signature faciale
       ]);
       this.message = '📸 Modèles chargés. Initialisation caméra...';
     } catch (e) {
@@ -64,7 +63,7 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
     console.log('📸 Bouton cliqué, capture en cours...');
 
     const result = await faceapi
-      .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()) // ✅ c'est bon
+      .detectSingleFace(video, new faceapi.SsdMobilenetv1Options()) // ✅ bon détecteur
       .withFaceLandmarks()
       .withFaceDescriptor();
 
