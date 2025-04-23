@@ -9,10 +9,12 @@ import { FaceScanComponent } from '../face-scan/face-scan.component';
   standalone: true,
   imports: [CommonModule, FaceScanComponent],
   templateUrl: './scan-qr.component.html',
+  styleUrls: ['./scan-qr.component.css'],
 })
 export class ScanQrComponent implements OnInit {
   tokenQr = '';
   message = '📷 Scan facial en cours...';
+  messageType: 'info' | 'success' | 'error' = 'info';
   hasReference: boolean | null = null;
 
   private readonly BASE_URL = 'https://emargementonline-production.up.railway.app/api';
@@ -46,10 +48,12 @@ export class ScanQrComponent implements OnInit {
 
   async onFaceVerified(descriptor: number[]) {
     this.message = '🧠 Visage capturé, vérification en cours...';
+    this.messageType = 'info';
 
     const tokenStorage = localStorage.getItem('_TOKEN_UTILISATEUR');
     if (!tokenStorage) {
       this.message = '❌ Non connecté';
+      this.messageType = 'error';
       return;
     }
 
@@ -59,12 +63,14 @@ export class ScanQrComponent implements OnInit {
     try {
       if (!this.hasReference) {
         this.message = '📸 Enregistrement photo de référence...';
+        this.messageType = 'info';
 
         await this.http
           .post(`${this.BASE_URL}/etudiants/face-reference`, { descriptor }, { headers })
           .toPromise();
 
         this.message = '✅ Référence enregistrée. Validation de présence...';
+        this.messageType = 'success';
       } else {
         const matchResponse = await this.http
           .post<{ match: boolean }>(
@@ -77,21 +83,31 @@ export class ScanQrComponent implements OnInit {
         const match = matchResponse?.match ?? false;
 
         if (!match) {
-          this.message = '❌ Reconnaissance faciale échouée';
+          this.message = '❌ Reconnaissance faciale échouée. Veuillez réessayer.';
+          this.messageType = 'error';
           return;
         }
 
         this.message = '✅ Visage reconnu. Validation de présence...';
+        this.messageType = 'success';
       }
 
-      await this.http
+      const res: any = await this.http
         .post(`${this.BASE_URL}/qrcode/${this.tokenQr}/scan`, { empreinte_device: "fallback-device", descriptor }, { headers })
         .toPromise();
 
-      this.message = '✅ Présence validée avec succès !';
-    } catch (err) {
+      this.message = res.message || '✅ Présence validée avec succès !';
+      this.messageType = 'success';
+
+      setTimeout(() => {
+        this.router.navigate(['/dashboard-etudiant']);
+      }, 2000);
+
+    } catch (err: any) {
       console.error(err);
-      this.message = '❌ Erreur pendant le processus';
+      const errorMessage = err?.error?.message || '❌ Erreur pendant le processus';
+      this.message = errorMessage;
+      this.messageType = 'error';
     }
   }
 

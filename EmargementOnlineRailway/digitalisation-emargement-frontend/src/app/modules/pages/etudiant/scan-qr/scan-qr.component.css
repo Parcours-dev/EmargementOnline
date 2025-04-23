@@ -1,0 +1,44 @@
+/* Conteneur global */
+.scan-qr-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', 'Helvetica', sans-serif;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+/* Bloc de statut de référence */
+.reference-status {
+  max-width: 500px;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.25rem;
+  background-color: #e9f5ff;
+  border-left: 4px solid #2196f3;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  color: #0c4a6e;
+}
+
+/* Message générique */
+.instruction-message {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+/* Couleurs dynamiques selon type */
+.instruction-message.success {
+  color: #28a745;
+}
+
+.instruction-message.error {
+  color: #dc3545;
+}
+
+.instruction-message.info {
+  color: #444;
+}
