@@ -1,12 +1,16 @@
-<div class="reference-status" *ngIf="hasReference !== null">
-  <p *ngIf="hasReference; else noRef">
-    🧠 Une photo de référence est déjà enregistrée. Vous allez être comparé à celle-ci.
+<div class="scan-qr-wrapper">
+  <div class="reference-status" *ngIf="hasReference !== null">
+    <p *ngIf="hasReference; else noRef">
+      🧠 Une photo de référence est déjà enregistrée. Vous allez être comparé à celle-ci.
+    </p>
+    <ng-template #noRef>
+      <p>📸 Aucune photo de référence trouvée. La première capture sera enregistrée comme référence.</p>
+    </ng-template>
+  </div>
+
+  <app-face-scan (faceVerified)="onFaceVerified($event)"></app-face-scan>
+
+  <p class="instruction-message" [ngClass]="messageType">
+    {{ message }}
   </p>
-  <ng-template #noRef>
-    <p>📸 Aucune photo de référence trouvée. La première capture sera enregistrée comme référence.</p>
-  </ng-template>
 </div>
-
-<app-face-scan (faceVerified)="onFaceVerified($event)"></app-face-scan>
-
-<p class="instruction-message" [ngClass]="messageType">{{ message }}</p>
