@@ -35,6 +35,7 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
         faceapi.nets.faceLandmark68Net.loadFromUri('/assets/models/face_landmark_68'),
         faceapi.nets.faceRecognitionNet.loadFromUri('/assets/models/face_recognition'),
       ]);
+      this.modelsLoaded = true; // ✅ Active le bouton
       this.message = '📸 Modèles chargés. Initialisation caméra...';
       console.log("✅ Tous les modèles ont bien été chargés !");
     } catch (e) {
