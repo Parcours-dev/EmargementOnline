@@ -1,0 +1,247 @@
+.navbar {
+  background-color: #007bff;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+}
+
+.content {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.image-container {
+  cursor: pointer;
+}
+
+.modal-body {
+  display: flex;
+  justify-content: center;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.navbar-dark {
+  background-color: #003366;
+  /* Bleu foncé pour la navbar */
+}
+
+.blue-block {
+  background-color: #004085;
+  /* Bleu plus foncé pour le bloc */
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.content-inside {
+  background-color: white;
+  padding: 30px;
+  border-radius: 15px;
+}
+
+/* Bouton avec la même couleur que le bloc bleu */
+.btn-blue {
+  background-color: #004085; /* Bleu foncé */
+  color: white; /* Texte en blanc pour la lisibilité */
+  border: none; /* Pas de bordure */
+}
+
+/* Changer le style du bouton au survol */
+.btn-blue:hover {
+  background-color: #003366; /* Couleur plus foncée au survol */
+  color: white; /* Assurez-vous que le texte reste blanc au survol */
+}
+
+footer {
+  background-color: #003366; /* Couleur de fond du footer */
+  color: white; /* Couleur du texte */
+  padding: 20px 0;
+  position: relative; /* Pour positionner l'image dans le coin */
+}
+
+/* Style pour l'image dans le coin droit */
+.footer-image {
+  position: absolute;
+  right: 10px; /* Positionne l'image à 10px du bord droit */
+  bottom: 10px; /* Positionne l'image à 10px du bas */
+  width: 50px; /* Taille de l'image, ajustez selon vos besoins */
+  height: auto;
+}
+
+/* Texte dans le footer centré */
+.footer-text {
+  text-align: center;
+}
+
+/* Classe pour les liens centrés et plus petits */
+.navbar-link-small {
+  font-size: 0.8rem; /* Taille plus petite pour les liens */
+}
+
+/* Rendre le bouton rectangulaire avec bords arrondis et fond blanc, plus petit */
+.deconnexion-btn {
+  padding: 4px 12px;  /* Taille du bouton réduite */
+  font-size: 0.8rem;   /* Réduire la taille de la police */
+  border: 2px solid #fff; /* Bordure blanche */
+  background-color: #fff; /* Fond blanc */
+  color: #000; /* Texte noir */
+  border-radius: 20px; /* Bords arrondis */
+}
+
+/* Ajouter un effet au survol */
+.deconnexion-btn:hover {
+  background-color: #f0f0f0; /* Changer la couleur de fond lors du survol */
+  border-color: #ccc; /* Changer la couleur de la bordure */
+  color: #000; /* Garder le texte noir */
+}
+
+.grayed-background {
+  background-color: rgba(169, 169, 169, 0.2); /* Gris léger avec un peu de transparence */
+}
+
+/* Centrer le contenu de la page */
+.main-content {
+  display: flex;
+  justify-content: center; /* Centrer horizontalement */
+  align-items: flex-start; /* Aligner le contenu vers le haut */
+  min-height: calc(100vh - 150px); /* Minimum height avec espace pour header et footer */
+  padding-top: 50px; /* Espacement du header */
+  padding-bottom: 50px; /* Espacement du footer */
+}
+
+/* Centrer le contenu dans la div .container */
+.container {
+  max-width: 1200px; /* Limiter la largeur du contenu */
+  width: 100%;
+}
+
+/* Pour gérer l'espacement entre les cartes */
+.card {
+  margin-bottom: 20px; /* Espace entre les cartes */
+  border-radius: 25px; /* Ajuste selon tes préférences */
+}
+
+.carousel {
+  max-width: 400px;
+  margin: auto;
+  padding-top: 20px;
+}
+
+.card {
+  padding: 20px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Aligner label et select sur la même ligne */
+.select-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espacement entre label et select */
+  margin-top: 30px;
+}
+
+
+label {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+select {
+  border-radius: 10px; /* Arrondi les bords */
+  padding: 8px; /* Ajoute un peu d'espace intérieur */
+  border: 1px solid #ccc; /* Ajoute une bordure légère */
+  background-color: white; /* Assure un bon contraste */
+  outline: none; /* Enlève l'effet bleu par défaut au focus */
+  transition: 0.3s ease-in-out; /* Animation fluide */
+}
+
+/* Effet au survol et au focus */
+select:hover, select:focus {
+  border-color: #000000; /* Change la couleur de la bordure */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Effet lumineux */
+}
+/* Aligner "Statut" et l'icône sur la même ligne */
+.status-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espacement entre le texte et l'icône */
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+#status-icon {
+  font-size: 24px;
+}
+
+.scroll {
+  width: 100%;              /* Occupe toute la largeur disponible */
+  max-width: 100%; 
+  margin-top: 20px;
+  height: 200px;
+  overflow: auto;
+  background: #ffffff;
+  color: #000000;
+}
+
+.scroll p {
+  display: flex;
+  justify-content: space-between; /* Place le texte et l'icône aux extrémités */
+  align-items: center;
+  margin: 5px 0; /* Espace entre chaque élément */
+}
+
+.scroll p .icon {
+  margin-left: 10px; /* Un petit écart entre le texte et l'icône */
+  font-size: 18px; /* Taille de l'icône */
+  color: red; /* Couleur de l'icône */
+}
+
+.jour {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ccc;
+}
+
+.jour h3 {
+  margin: 0;
+  padding: 5px;
+  background-color: #e0e0e0;
+  text-align: center;
+  font-size: 18px;
+}
+
+.qr-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: white;
+}
+
+.btn-generate {
+  padding: 4px 12px;  /* Taille du bouton réduite */
+  font-size: 0.8rem;   /* Réduire la taille de la police */
+  border: 2px solid #003366; /* Bordure blanche */
+  background-color: #003366; /* Fond blanc */
+  color: #ffffff;
+  border-radius: 20px; /* Bords arrondis */
+}
+
+.btn-generate:hover {
+  background-color: #003366;
+  color: #ffffff;
+}

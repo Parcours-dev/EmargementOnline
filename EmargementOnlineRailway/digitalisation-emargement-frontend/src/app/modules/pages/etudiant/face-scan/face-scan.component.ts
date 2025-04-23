@@ -41,6 +41,8 @@ export class FaceScanComponent implements OnInit, AfterViewInit {
       this.message = '❌ Erreur chargement modèles';
       console.error(e);
     }
+
+    console.log("📦 Tous les modèles chargés avec succès !");
   }
 
   ngAfterViewInit(): void {
