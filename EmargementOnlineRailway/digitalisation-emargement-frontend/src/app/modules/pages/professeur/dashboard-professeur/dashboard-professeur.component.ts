@@ -57,7 +57,7 @@ export class DashBoardProfesseurComponent implements OnInit {
 
   chargerEmploiDuTemps(idProf: number, headers: HttpHeaders) {
     this.http
-      .get<any[]>(`${this.BASE_URL}/enseignants/${idProf}/emplois`, { headers })
+      .get<any[]>(`${this.BASE_URL}/enseignants/${idProf}/emplois`, {headers})
       .subscribe({
         next: (data) => {
           const today = new Date().toISOString().split("T")[0];
@@ -89,7 +89,7 @@ export class DashBoardProfesseurComponent implements OnInit {
   chargerEtudiantsCoursEnCours(headers: HttpHeaders) {
     if (!this.coursEnCours) return;
 
-    const { id_cours, id_groupe, date_heure_debut } = this.coursEnCours;
+    const {id_cours, id_groupe, date_heure_debut} = this.coursEnCours;
 
     const params = new URLSearchParams({
       id_cours,
@@ -97,7 +97,7 @@ export class DashBoardProfesseurComponent implements OnInit {
       date_heure_debut,
     });
 
-    this.http.get<any[]>(`${this.BASE_URL}/presences/controle?${params.toString()}`, { headers })
+    this.http.get<any[]>(`${this.BASE_URL}/presences/controle?${params.toString()}`, {headers})
       .subscribe({
         next: (data) => {
           this.etudiantsCours = data;
@@ -119,7 +119,7 @@ export class DashBoardProfesseurComponent implements OnInit {
       date_heure_debut: this.coursEnCours.date_heure_debut
     };
 
-    this.http.patch(`${this.BASE_URL}/presences/valider`, body, { headers }).subscribe({
+    this.http.patch(`${this.BASE_URL}/presences/valider`, body, {headers}).subscribe({
       next: (res: any) => {
         alert(res.message || 'Présence validée');
         this.chargerEtudiantsCoursEnCours(headers);
@@ -132,14 +132,18 @@ export class DashBoardProfesseurComponent implements OnInit {
     const idCours = cours.id_cours;
     const idGroupe = cours.id_groupe;
     const idProf = cours.id_professeur;
-    const date = formatDate(cours.date_heure_debut, 'yyyy-MM-dd HH:mm:ss', 'fr-FR');
-    const identifiant = `${idCours}-${idGroupe}-${idProf}-${date}`;
+
+    const localDate = new Date(cours.date_heure_debut);
+    const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
+    const formattedDateUTC = formatDate(utcDate, 'yyyy-MM-dd HH:mm:ss', 'en-US');
+
+    const identifiant = `${idCours}-${idGroupe}-${idProf}-${formattedDateUTC}`;
     const encodedId = encodeURIComponent(identifiant);
 
     window.open(
       `https://emargementonline-production.up.railway.app/generation-qr?creneau_id=${encodedId}`,
-      "_blank",
-      "width=420,height=500"
+      '_blank',
+      'width=420,height=500'
     );
   }
 }
