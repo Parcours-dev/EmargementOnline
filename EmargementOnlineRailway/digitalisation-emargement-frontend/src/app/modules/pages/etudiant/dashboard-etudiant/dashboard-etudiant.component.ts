@@ -22,6 +22,8 @@ export class DashBoardEtudiantComponent implements OnInit {
   statutEmargement: boolean | null = null;
   historique: { jour: string, cours: any[] }[] = [];
   jourFiltre: string = '';
+  dateDebut: string = '';
+  dateFin: string = '';
   justificatifs: any[] = [];
   headers: HttpHeaders | null = null;
 
@@ -71,7 +73,9 @@ export class DashBoardEtudiantComponent implements OnInit {
 
           c.commentaire = '';
           c.fichier = null;
-          c.depotOk = false; // ✅ flag pour afficher le badge de succès
+          c.depotOk = false;
+          c.depotErreur = false;
+          c.toggleJustif = false;
 
           regroupement[jour].push(c);
         });
@@ -90,6 +94,25 @@ export class DashBoardEtudiantComponent implements OnInit {
       next: (data) => this.justificatifs = data,
       error: () => console.error("❌ Erreur chargement justificatifs")
     });
+  }
+
+  appliquerFiltreDate() {
+    if (!this.dateDebut && !this.dateFin) return;
+
+    this.historique.forEach(bloc => {
+      bloc.cours = bloc.cours.filter(cours => {
+        const date = new Date(cours.date_heure_debut);
+        const dateDebutVal = this.dateDebut ? new Date(this.dateDebut) : null;
+        const dateFinVal = this.dateFin ? new Date(this.dateFin) : null;
+        return (!dateDebutVal || date >= dateDebutVal) && (!dateFinVal || date <= dateFinVal);
+      });
+    });
+  }
+
+  resetFiltreDate() {
+    this.dateDebut = '';
+    this.dateFin = '';
+    this.chargerHistorique();
   }
 
   verifierStatutPresence() {
@@ -161,12 +184,11 @@ export class DashBoardEtudiantComponent implements OnInit {
         cours.depotOk = true;
         cours.depotErreur = false;
 
-        // Optionnel : faire disparaître le badge après 5 secondes
         setTimeout(() => {
           cours.depotOk = false;
         }, 5000);
 
-        this.chargerHistorique(); // recharge l’état des cours
+        this.chargerHistorique();
       },
       error: (err) => {
         console.error("❌ Erreur lors de l’envoi du justificatif", err);

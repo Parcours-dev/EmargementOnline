@@ -23,73 +23,75 @@
       <!-- 🧾 Colonne 2 : Historique -->
       <div class="col-lg-5 col-md-6">
         <section class="historique">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5>Historique de présence</h5>
-            <select class="form-select w-auto" [(ngModel)]="jourFiltre">
+          <h5>Historique de présence</h5>
+
+          <!-- 🔎 Filtres dates -->
+          <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+            <input type="date" class="form-control" [(ngModel)]="dateDebut" />
+            <input type="date" class="form-control" [(ngModel)]="dateFin" />
+            <button class="btn btn-outline-primary btn-sm" (click)="appliquerFiltreDate()">Filtrer</button>
+            <button class="btn btn-outline-secondary btn-sm" (click)="resetFiltreDate()">Réinitialiser</button>
+            <select class="form-select w-auto ms-auto" [(ngModel)]="jourFiltre">
               <option value="">-- Filtrer par jour --</option>
               <option *ngFor="let bloc of historique" [value]="bloc.jour">{{ bloc.jour }}</option>
             </select>
           </div>
 
+          <!-- 📅 Boucle sur l’historique -->
           <div *ngFor="let bloc of historique" [hidden]="jourFiltre && jourFiltre !== bloc.jour">
             <h6 class="text-capitalize fw-semibold">{{ bloc.jour }}</h6>
             <ul class="list-group mb-3">
               <li *ngFor="let cours of bloc.cours" class="list-group-item">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                   <div>
-                    <strong>{{ cours.nom_cours }}</strong> — <span class="text-muted">{{ cours.nom_groupe }}</span><br />
+                    <strong>{{ cours.nom_cours }}</strong> —
+                    <span class="text-muted">{{ cours.nom_groupe }}</span><br />
                     <small class="text-muted">{{ cours.date_heure_debut | date:'shortTime' }} - {{ cours.date_heure_fin | date:'shortTime' }}</small>
                   </div>
                   <span [ngClass]="{ 'text-success': cours.present, 'text-danger': !cours.present }" class="mt-2 mt-md-0 fw-bold fs-5">
-                    {{ cours.present ? '✅ Présent' : '❌ Absent' }}
-                  </span>
+              {{ cours.present ? '✅ Présent' : '❌ Absent' }}
+            </span>
                 </div>
 
-                <!-- 📎 Bloc justificatif -->
-                <div *ngIf="!cours.present && !estCoursAvenir(cours)" class="mt-3 p-3 border rounded bg-light">
-                  <label class="form-label fw-semibold">Déposer un justificatif (PDF ou image) :</label>
-
-                  <div class="mb-2">
-                    <input
-                      type="file"
-                      accept=".pdf,image/*"
-                      (change)="onFileSelected($event, cours)"
-                      class="form-control"
-                    />
-                  </div>
-
-                  <div *ngIf="cours.fichier" class="text-success mb-2">
-                    ✅ <strong>{{ cours.fichier.name }}</strong> prêt à être envoyé.
-                  </div>
-
-                  <div class="mb-2">
-                    <textarea
-                      [(ngModel)]="cours.commentaire"
-                      placeholder="Ex : certificat médical, convocation..."
-                      class="form-control"
-                      rows="2"
-                    ></textarea>
-                  </div>
-
-                  <button
-                    class="btn btn-primary btn-sm"
-                    [disabled]="!cours.fichier"
-                    (click)="deposerJustificatif(cours)"
-                  >
-                    📤 Envoyer le justificatif
+                <!-- 📎 Accordéon justificatif -->
+                <div *ngIf="!cours.present && !estCoursAvenir(cours)" class="mt-3">
+                  <button class="btn btn-outline-dark btn-sm mb-2" (click)="cours.toggleJustif = !cours.toggleJustif">
+                    📎 {{ cours.toggleJustif ? 'Masquer le justificatif' : 'Déposer un justificatif' }}
                   </button>
 
-                  <div *ngIf="cours.depotOk" class="justif-success-badge">
-                    ✅ Justificatif envoyé avec succès
-                  </div>
-                  <div *ngIf="cours.depotErreur" class="alert alert-danger mt-2 p-2">
-                    ❌ Erreur lors de l'envoi du justificatif
+                  <div *ngIf="cours.toggleJustif" class="p-3 border rounded bg-light">
+                    <label class="form-label fw-semibold">Déposer un justificatif (PDF ou image) :</label>
+
+                    <div class="mb-2">
+                      <input type="file" accept=".pdf,image/*" (change)="onFileSelected($event, cours)" class="form-control" />
+                    </div>
+
+                    <div *ngIf="cours.fichier" class="text-success mb-2">
+                      ✅ <strong>{{ cours.fichier.name }}</strong> prêt à être envoyé.
+                    </div>
+
+                    <div class="mb-2">
+                      <textarea [(ngModel)]="cours.commentaire" placeholder="Ex : certificat médical, convocation..." class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary btn-sm" [disabled]="!cours.fichier" (click)="deposerJustificatif(cours)">
+                      📤 Envoyer le justificatif
+                    </button>
+
+                    <div *ngIf="cours.depotOk" class="justif-success-badge mt-2 text-success fw-semibold">
+                      ✅ Justificatif envoyé avec succès
+                    </div>
+                    <div *ngIf="cours.depotErreur" class="alert alert-danger mt-2 p-2">
+                      ❌ Erreur lors de l'envoi du justificatif
+                    </div>
                   </div>
                 </div>
+              </li>
             </ul>
           </div>
         </section>
       </div>
+
     </div>
   </div>
 </main>
