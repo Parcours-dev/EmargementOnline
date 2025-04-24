@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^4.6.2",
+    "crypto-js": "^4.2.0"
+  }
+}

@@ -60,52 +60,91 @@ const enregistrerPresenceViaQr = async (req, res) => {
 
     try {
         if (!user || user.role !== "etudiant") {
-            return res.status(403).json({ status: "unauthorized", message: "Seuls les étudiants peuvent émarger via QR Code." });
+            return res.status(403).json({
+                status: "unauthorized",
+                message: "Seuls les étudiants peuvent émarger via QR Code.",
+            });
         }
 
+        // 🔍 Vérification validité du token
         const [result] = await db.query(
             `SELECT * FROM qr_code WHERE token = ? AND date_expiration >= NOW()`,
             [token]
         );
 
         if (result.length === 0) {
-            return res.status(400).json({ status: "expired", message: "QR Code expiré ou invalide." });
+            return res.status(400).json({
+                status: "expired",
+                message: "QR Code expiré ou invalide.",
+            });
         }
 
         const qr = result[0];
 
+        // 🚫 Contrôle anti-fraude : ce fingerprint a-t-il déjà été utilisé par un autre étudiant ?
+        if (empreinte_device) {
+            const [fingerprintCheck] = await db.query(
+                `SELECT DISTINCT NEtudiant FROM emargement WHERE empreinte_device = ?`,
+                [empreinte_device]
+            );
+
+            if (
+                fingerprintCheck.length > 0 &&
+                fingerprintCheck[0].NEtudiant !== user.id
+            ) {
+                return res.status(403).json({
+                    status: "device_conflict",
+                    message:
+                        "⚠️ Ce téléphone est déjà utilisé par un autre étudiant. Veuillez utiliser votre appareil personnel.",
+                });
+            }
+        }
+
+        // ❌ Si l'appareil a déjà servi pour ce cours (même fingerprint)
         const [deviceExists] = await db.query(
             `SELECT * FROM emargement 
-             WHERE empreinte_device = ? AND id_cours = ? AND date_heure_debut = ?`,
+       WHERE empreinte_device = ? AND id_cours = ? AND date_heure_debut = ?`,
             [empreinte_device, qr.id_cours, qr.date_heure_debut]
         );
 
         if (deviceExists.length > 0) {
-            return res.status(403).json({ status: "device_duplicate", message: "Ce téléphone a déjà été utilisé pour ce cours." });
+            return res.status(403).json({
+                status: "device_duplicate",
+                message: "Ce téléphone a déjà été utilisé pour ce cours.",
+            });
         }
 
+        // ⛔ Présence déjà enregistrée ?
         const [existant] = await db.query(
             `SELECT * FROM emargement 
-             WHERE NEtudiant = ? AND id_cours = ? AND date_heure_debut = ?`,
+       WHERE NEtudiant = ? AND id_cours = ? AND date_heure_debut = ?`,
             [user.id, qr.id_cours, qr.date_heure_debut]
         );
 
         if (existant.length > 0) {
-            return res.status(409).json({ status: "already_present", message: "Présence déjà enregistrée pour ce cours." });
+            return res.status(409).json({
+                status: "already_present",
+                message: "Présence déjà enregistrée pour ce cours.",
+            });
         }
 
+        // 🧠 Vérification faciale
         if (descriptor) {
             const match = await verifierDescripteur(user.id, descriptor);
             if (!match) {
-                return res.status(403).json({ status: "face_mismatch", message: "⚠️ Visage non reconnu. Accès refusé." });
+                return res.status(403).json({
+                    status: "face_mismatch",
+                    message: "⚠️ Visage non reconnu. Accès refusé.",
+                });
             }
         }
 
+        // ✅ Enregistrement de la présence
         await db.query(
             `INSERT INTO emargement 
-             (NEtudiant, id_cours, id_groupe, id_professeur, date_heure_signature, date_heure_debut, 
-              token_utilisé, empreinte_device, ip_adresse, user_agent)
-             VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)`,
+       (NEtudiant, id_cours, id_groupe, id_professeur, date_heure_signature, date_heure_debut, 
+        token_utilisé, empreinte_device, ip_adresse, user_agent)
+       VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)`,
             [
                 user.id,
                 qr.id_cours,
@@ -115,10 +154,11 @@ const enregistrerPresenceViaQr = async (req, res) => {
                 token,
                 empreinte_device || null,
                 req.ip,
-                req.headers["user-agent"]
+                req.headers["user-agent"],
             ]
         );
 
+        // 🎁 Envoi des UBTokens si adresse ETH connue
         const [[etu]] = await db.query(
             "SELECT adresse_eth FROM etudiant WHERE NEtudiant = ?",
             [user.id]
@@ -136,13 +176,19 @@ const enregistrerPresenceViaQr = async (req, res) => {
             }
         }
 
-        res.status(200).json({ status: "success", message: "Présence enregistrée et récompense envoyée ✅" });
-
+        return res.status(200).json({
+            status: "success",
+            message: "Présence enregistrée et récompense envoyée ✅",
+        });
     } catch (err) {
         console.error("❌ Erreur générale :", err);
-        res.status(500).json({ status: "error", message: "Erreur serveur." });
+        return res.status(500).json({
+            status: "error",
+            message: "Erreur serveur.",
+        });
     }
 };
+
 
 module.exports = {
     generateQrCode,
