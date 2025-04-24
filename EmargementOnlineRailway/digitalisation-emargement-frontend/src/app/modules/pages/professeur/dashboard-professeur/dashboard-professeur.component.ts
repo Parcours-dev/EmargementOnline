@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   inject
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
@@ -16,10 +17,11 @@ import { FooterComponent } from "../../../core/footer/footer.component";
   templateUrl: "./dashboard-professeur.component.html",
   styleUrls: ["./dashboard-professeur.component.css"]
 })
-export class DashBoardProfesseurComponent implements OnInit {
+export class DashBoardProfesseurComponent implements OnInit, OnDestroy {
   coursDuJour: any[] = [];
   coursEnCours: any | null = null;
   etudiantsCours: any[] = [];
+  private refreshInterval: any;
 
   private readonly BASE_URL = "https://emargementonline-production.up.railway.app/api";
   private http = inject(HttpClient);
@@ -83,6 +85,14 @@ export class DashBoardProfesseurComponent implements OnInit {
 
     if (this.coursEnCours) {
       this.chargerEtudiantsCoursEnCours(headers);
+
+      // 🔁 Rafraîchissement toutes les 2 secondes
+      this.refreshInterval = setInterval(() => {
+        this.chargerEtudiantsCoursEnCours(headers);
+      }, 3000);
+    } else {
+      // 🔕 Si aucun cours en cours, stoppe l’intervalle (sécurité)
+      if (this.refreshInterval) clearInterval(this.refreshInterval);
     }
   }
 
@@ -146,6 +156,11 @@ export class DashBoardProfesseurComponent implements OnInit {
       '_blank',
       'width=420,height=500'
     );
+  }
+  ngOnDestroy(): void {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
   }
 
 }
