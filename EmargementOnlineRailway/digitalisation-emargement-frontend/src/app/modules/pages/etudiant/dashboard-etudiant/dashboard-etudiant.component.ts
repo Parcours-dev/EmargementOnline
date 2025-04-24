@@ -29,7 +29,7 @@ export class DashBoardEtudiantComponent implements OnInit {
 
   qrCodeActif: { token: string, scan_url: string, expires_in: number } | null = null;
 
-  private readonly BASE_URL = "http://localhost:3000/api";
+  private readonly BASE_URL = " https://emargementonline-production.up.railway.app/api";
   private http = inject(HttpClient);
 
   ngOnInit(): void {
