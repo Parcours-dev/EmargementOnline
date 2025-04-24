@@ -130,14 +130,14 @@ const getJustificatifs = async (req, res) => {
                     creneau.date_heure_fin,
                     cours.nom AS nom_cours
                 FROM justificatifs
-                         JOIN etudiant ON justificatifs.id_etudiant = etudiant.NEtudiant
-                         JOIN groupe ON justificatifs.id_groupe = groupe.id_groupe
-                         JOIN cours ON justificatifs.id_cours = cours.id_cours
+                         JOIN etudiant ON justificatifs.id_etudiant COLLATE utf8mb4_unicode_ci = etudiant.NEtudiant COLLATE utf8mb4_unicode_ci
+                         JOIN groupe ON justificatifs.id_groupe COLLATE utf8mb4_unicode_ci = groupe.id_groupe COLLATE utf8mb4_unicode_ci
+                         JOIN cours ON justificatifs.id_cours COLLATE utf8mb4_unicode_ci = cours.id_cours COLLATE utf8mb4_unicode_ci
                          LEFT JOIN creneau ON
-                             justificatifs.id_cours = creneau.id_cours AND
-                             justificatifs.id_groupe = creneau.id_groupe AND
-                             justificatifs.date_heure_debut = creneau.date_heure_debut
-                ${whereClause}
+                    justificatifs.id_cours COLLATE utf8mb4_unicode_ci = creneau.id_cours COLLATE utf8mb4_unicode_ci AND
+                    justificatifs.id_groupe COLLATE utf8mb4_unicode_ci = creneau.id_groupe COLLATE utf8mb4_unicode_ci AND
+                    justificatifs.date_heure_debut = creneau.date_heure_debut
+                    ${whereClause}
                 ORDER BY justificatifs.date_soumission DESC
             `,
             params
