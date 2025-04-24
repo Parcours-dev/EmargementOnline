@@ -128,3 +128,44 @@ label {
   border: 2px dashed #6c757d !important; /* gris neutre avec style différent */
 }
 
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.row.g-4 {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.cours-du-jour,
+.historique {
+  height: 100%;
+}
+
+.col-lg-4,
+.col-md-6,
+.col-lg-5 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.historique {
+  max-height: 75vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+
+/* Optionnel pour la scrollbar en Webkit (Chrome, Safari) */
+.historique::-webkit-scrollbar {
+  width: 6px;
+}
+
+.historique::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}
