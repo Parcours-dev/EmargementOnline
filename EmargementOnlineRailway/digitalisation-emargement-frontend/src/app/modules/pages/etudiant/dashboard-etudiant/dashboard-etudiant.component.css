@@ -1,38 +1,65 @@
-/* Générale */
+/* 🌐 Général */
 .main-content {
   padding-top: 20px;
   padding-bottom: 40px;
   background-color: #f5f7fa;
 }
 
-/* Grille dashboard */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 3fr;
-  gap: 2rem;
-  padding-top: 1rem;
+.container {
+  display: flex;
+  justify-content: center;
 }
 
-/* Colonne gauche - cours du jour */
+/* 🧱 Grille globale */
+.row.g-4 {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  min-height: 80vh;
+}
+
+.col-lg-4,
+.col-md-6,
+.col-lg-5 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 🕐 Colonne gauche - Cours du jour */
 .cours-du-jour {
   background-color: white;
   padding: 1.5rem;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  position: sticky;
-  top: 20px;
-  height: fit-content;
+  height: 100%;
 }
 
-/* Colonne droite - historique */
+/* 📜 Colonne droite - Historique */
 .historique {
   background-color: white;
   padding: 1.5rem;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  height: 100%;
+  max-height: 75vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
 }
 
-/* Cartes */
+.historique::-webkit-scrollbar {
+  width: 6px;
+}
+
+.historique::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}
+
+/* 🧾 Cartes cours */
 .card {
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -42,14 +69,13 @@
   transform: scale(1.01);
 }
 
-/* Titres de section */
 .card-body h5 {
   font-size: 1.2rem;
   font-weight: 600;
   color: #333;
 }
 
-/* Statuts */
+/* ✅ Statuts */
 .text-success {
   color: #28a745 !important;
   font-weight: bold;
@@ -63,14 +89,18 @@
   font-weight: bold;
 }
 
-/* Dropdown */
+/* 🔽 Dropdowns */
 .form-select {
   border-radius: 12px;
   padding: 8px 12px;
   font-size: 0.95rem;
 }
+.card-body select.form-select {
+  min-width: 180px;
+  font-size: 0.95rem;
+}
 
-/* Présences - Historique */
+/* 🧾 Liste des cours */
 .list-group-item {
   border: none;
   border-radius: 8px;
@@ -79,7 +109,7 @@
   padding: 10px 16px;
 }
 
-/* Cours du jour - état */
+/* 🟦 Couleurs des bordures */
 .border-success {
   border: 2px solid #28a745 !important;
 }
@@ -92,13 +122,16 @@
 .border-secondary {
   border: 2px solid #6c757d !important;
 }
+.border-upcoming {
+  border: 2px dashed #6c757d !important;
+}
 
-/* Labels */
+/* 🏷️ Labels */
 label {
   font-weight: 500;
 }
 
-/* Responsive fix */
+/* 📱 Responsive mobile */
 @media (max-width: 768px) {
   .dashboard-grid {
     display: flex;
@@ -115,57 +148,7 @@ label {
     padding: 1rem;
     box-shadow: none;
     border-radius: 12px;
+    max-height: none;
+    overflow: visible;
   }
-}
-
-/* Historique - Dropdown filtre */
-.card-body select.form-select {
-  min-width: 180px;
-  font-size: 0.95rem;
-}
-
-.border-upcoming {
-  border: 2px dashed #6c757d !important; /* gris neutre avec style différent */
-}
-
-.container {
-  display: flex;
-  justify-content: center;
-}
-
-.row.g-4 {
-  display: flex;
-  gap: 2rem;
-  width: 100%;
-  max-width: 1200px;
-}
-
-.cours-du-jour,
-.historique {
-  height: 100%;
-}
-
-.col-lg-4,
-.col-md-6,
-.col-lg-5 {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.historique {
-  max-height: 75vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #ccc transparent;
-}
-
-/* Optionnel pour la scrollbar en Webkit (Chrome, Safari) */
-.historique::-webkit-scrollbar {
-  width: 6px;
-}
-
-.historique::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 10px;
 }
