@@ -178,6 +178,90 @@
         <button class="btn btn-success mt-3" type="submit">💾 Enregistrer</button>
       </form>
     </div>
+
+    <!-- PANEL JUSTIFICATIFS -->
+    <div *ngIf="activePanel === 'justificatifs'" class="accordion-panel card p-4 mb-4">
+      <h4 class="mb-3">📎 Justificatifs soumis</h4>
+
+      <!-- 🎯 Filtres -->
+      <form class="row g-3 mb-4" (ngSubmit)="chargerJustificatifsDepuisFiltres()">
+        <div class="col-md-3">
+          <label class="form-label">Promotion</label>
+          <select class="form-select" [(ngModel)]="filtreJustif['id_promotion']" name="filtrePromo">
+            <option value="">Toutes</option>
+            <option *ngFor="let promo of promotions" [value]="promo.id_promotion">{{ promo.nom }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Étudiant</label>
+          <select class="form-select" [(ngModel)]="filtreJustif['id_etudiant']" name="filtreEtu">
+            <option value="">Tous</option>
+            <option *ngFor="let etu of etudiants" [value]="etu.NEtudiant">
+              {{ etu.prenom }} {{ etu.nom }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Statut</label>
+          <select class="form-select" [(ngModel)]="filtreJustif['statut']" name="filtreStatut">
+            <option value="">Tous</option>
+            <option value="en_attente">En attente</option>
+            <option value="accepte">Accepté</option>
+            <option value="refuse">Refusé</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Date min</label>
+          <input type="date" class="form-control" [(ngModel)]="filtreJustif['date_min']" name="filtreMin" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Date max</label>
+          <input type="date" class="form-control" [(ngModel)]="filtreJustif['date_max']" name="filtreMax" />
+        </div>
+        <div class="col-12 text-end">
+          <button class="btn btn-primary mt-2" type="submit">🔍 Rechercher</button>
+        </div>
+      </form>
+      <!-- 📋 Tableau -->
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th>Étudiant</th>
+          <th>Cours</th>
+          <th>Date</th>
+          <th>Fichier</th>
+          <th>Commentaire</th>
+          <th>Statut</th>
+          <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let justif of justificatifs">
+          <td>{{ justif.prenom_etudiant }} {{ justif.nom_etudiant }}</td>
+          <td>{{ justif.nom_cours }}</td>
+          <td>{{ justif.date_heure_debut | date:'short' }}</td>
+          <td>
+            <a [href]="'https://emargementonline-production.up.railway.app/uploads/justificatifs/' + justif.fichier_url" target="_blank">📄 Voir</a>
+          </td>
+          <td>
+            <input [(ngModel)]="justif.commentaire_admin" class="form-control" placeholder="Commentaire..." />
+          </td>
+          <td>
+          <span [ngClass]="{
+              'text-warning': justif.statut === 'en_attente',
+              'text-success': justif.statut === 'accepte',
+              'text-danger': justif.statut === 'refuse'
+            }">{{ justif.statut }}</span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-success me-2" (click)="traiterJustificatif(justif, 'accepte')">✅</button>
+            <button class="btn btn-sm btn-danger" (click)="traiterJustificatif(justif, 'refuse')">❌</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </main>
 <app-footer />
