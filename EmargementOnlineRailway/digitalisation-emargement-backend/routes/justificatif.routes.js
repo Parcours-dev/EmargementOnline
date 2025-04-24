@@ -143,4 +143,37 @@ router.patch("/cfa/justificatifs/:id", justificatifController.traiterJustificati
  */
 router.get("/cfa/justificatifs", justificatifController.getJustificatifs);
 
+
+/**
+ * @swagger
+ * /justificatifs/{filename}:
+ *   get:
+ *     summary: Affiche un fichier justificatif
+ *     description: Retourne le fichier PDF ou image du justificatif à partir de son nom.
+ *     tags: [Justificatifs]
+ *     parameters:
+ *       - in: path
+ *         name: filename
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Nom du fichier (ex: justif-123456.pdf)
+ *     responses:
+ *       200:
+ *         description: Fichier retourné avec succès
+ *       404:
+ *         description: Fichier introuvable
+ */
+router.get("/justificatifs/:filename", verifyToken, (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, "..", "uploads", "justificatifs", filename);
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error("❌ Erreur envoi fichier justificatif :", err);
+            res.status(404).json({ message: "Fichier non trouvé." });
+        }
+    });
+});
+
+
 module.exports = router;

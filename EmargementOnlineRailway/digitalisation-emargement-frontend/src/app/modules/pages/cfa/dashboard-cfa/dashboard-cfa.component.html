@@ -244,7 +244,11 @@
           <td>{{ justif.nom_cours }}</td>
           <td>{{ justif.date_heure_debut | date:'short' }}</td>
           <td>
-            <a [href]="'https://emargementonline-production.up.railway.app/uploads/justificatifs/' + justif.fichier_url" target="_blank">📄 Voir</a>
+            <a class="btn btn-outline-secondary btn-sm"
+               [href]="'https://emargementonline-production.up.railway.app/api/justificatifs/' + justif.fichier_url"
+               target="_blank">
+              📂 Voir le justificatif
+            </a>
           </td>
           <td>
             <input [(ngModel)]="justif.commentaire_admin" class="form-control" placeholder="Commentaire..." />
