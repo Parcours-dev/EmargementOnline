@@ -1,42 +1,43 @@
 <app-header />
 <main class="grayed-background">
-    <div class="d-flex justify-content-center align-items-center vh-100">
-        <div class="blue-block">
-            <div class="content-inside text-center">
-                <h2>Bienvenue sur le site de l'émargement en ligne</h2>
-                <p>Cliquez pour vous identifiez</p>
-                <button class="btn btn-blue" data-bs-toggle="modal" data-bs-target="#loginModal">Identiez-vous</button>
-            </div>
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="blue-block">
+      <div class="content-inside text-center">
+        <h2>Bienvenue sur le site de l'émargement en ligne</h2>
+        <p>Cliquez pour vous identifiez</p>
+        <button class="btn btn-blue" data-bs-toggle="modal" data-bs-target="#loginModal">Identifiez-vous</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Connexion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <div class="modal-body">
+          <div class="form-container">
+            <form action="#" method="get" novalidate="" [formGroup]="formulaireConnexionUtilisateur">
+              <div class="mb-3">
+                <label for="email" class="form-label">Email Utilisateur</label>
+                <input [formControl]="emailControl" type="email" class="form-control" id="email"
+                       placeholder="Entrez votre adresse mail">
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input [formControl]="motDePasseControl" type="password" class="form-control" id="password"
+                       placeholder="Entrez votre mot de passe">
+              </div>
+              <button type="submit" class="btn btn-blue w-100" (click)="connecterUtilisateur()" data-bs-dismiss="modal">Se connecter</button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLabel">Connexion</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-container">
-                      <form action="#" method="get" novalidate="" [formGroup]="formulaireConnexionUtilisateur">
-                      <div class="mb-3">
-                                <label for="email" class="form-label">Email Utilisateurr</label>
-                                <input [formControl]="emailControl" type="email" class="form-control" id="email"
-                                       placeholder="Entrez votre adresse mail">
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Mot de passe</label>
-                                <input [formControl]="motDePasseControl" type="password" class="form-control" id="password"
-                                    placeholder="Entrez votre mot de passe">
-                            </div>
-                            <button type="submit" class="btn btn-blue w-100" (click)="connecterUtilisateur()" data-bs-dismiss="modal">Se connecter</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+  </div>
 </main>
 
 <app-footer />

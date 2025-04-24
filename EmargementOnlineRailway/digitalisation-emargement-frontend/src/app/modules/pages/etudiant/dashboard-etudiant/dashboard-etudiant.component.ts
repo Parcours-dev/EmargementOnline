@@ -10,7 +10,7 @@ import { UbtWalletWidgetComponent } from '../../../core/ubt-wallet-widget/ubt-wa
 @Component({
   selector: "app-dashboard-etudiant",
   standalone: true,
-  imports: [HeaderComponent, FooterComponent, CommonModule, FormsModule, UbtWalletWidgetComponent],
+  imports: [HeaderComponent, FooterComponent, CommonModule, FormsModule],
   templateUrl: "./dashboard-etudiant.component.html",
   styleUrls: ['./dashboard-etudiant.component.css']
 })
@@ -29,7 +29,7 @@ export class DashBoardEtudiantComponent implements OnInit {
 
   qrCodeActif: { token: string, scan_url: string, expires_in: number } | null = null;
 
-  private readonly BASE_URL = "https://emargementonline-production.up.railway.app/api";
+  private readonly BASE_URL = "http://localhost:3000/api";
   private http = inject(HttpClient);
 
   ngOnInit(): void {

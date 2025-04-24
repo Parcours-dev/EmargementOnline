@@ -21,8 +21,7 @@
                 </div>
 
                 <!-- ✅ Bouton QR Code -->
-                <button *ngIf="cours === coursEnCours"
-                        class="btn btn-sm btn-outline-success ms-3"
+                <button *ngIf="cours === coursEnCours" class="btn btn-sm btn-outline-success ms-3"
                         (click)="lancerGenerationQr(cours)">
                   🚀 Générer QR Code
                 </button>
@@ -31,39 +30,40 @@
               <!-- 👥 Liste des étudiants attendus -->
               <div *ngIf="cours === coursEnCours && etudiantsCours.length > 0" class="mt-3">
                 <h6>👥 Étudiants attendus</h6>
-                <table class="table table-sm table-bordered mt-2">
-                  <thead class="table-light">
-                  <tr>
-                    <th>Nom</th>
-                    <th>Prénom</th>
-                    <th>Email</th>
-                    <th>Statut</th>
-                    <th>Action</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr *ngFor="let etudiant of etudiantsCours">
-                    <td>{{ etudiant.nom }}</td>
-                    <td>{{ etudiant.prenom }}</td>
-                    <td>{{ etudiant.email }}</td>
-                    <td>
-                        <span [ngClass]="{
+                <div style="max-height: 400px; overflow-y: auto;">
+                  <table class="table table-sm table-bordered mt-2">
+                    <thead class="table-light">
+                    <tr>
+                      <th>Nom</th>
+                      <th>Prénom</th>
+                      <th>Email</th>
+                      <th>Statut</th>
+                      <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let etudiant of etudiantsCours">
+                      <td>{{ etudiant.nom }}</td>
+                      <td>{{ etudiant.prenom }}</td>
+                      <td>{{ etudiant.email }}</td>
+                      <td>
+                          <span [ngClass]="{
                           'text-success': etudiant.present,
                           'text-danger': !etudiant.present
                         }">
-                          {{ etudiant.present ? 'Présent' : 'Absent' }}
-                        </span>
-                    </td>
-                    <td>
-                      <button *ngIf="!etudiant.present"
-                              class="btn btn-sm btn-outline-primary"
-                              (click)="validerPresenceManuelle(etudiant.email)">
-                        Valider
-                      </button>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
+                            {{ etudiant.present ? 'Présent' : 'Absent' }}
+                          </span>
+                      </td>
+                      <td>
+                        <button *ngIf="!etudiant.present" class="btn btn-sm btn-outline-primary"
+                                (click)="validerPresenceManuelle(etudiant.email)">
+                          Valider
+                        </button>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>

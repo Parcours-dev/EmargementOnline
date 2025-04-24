@@ -15,35 +15,39 @@
       <button class="btn btn-toggle" (click)="togglePanel('justificatifs')">
         📎 Gérer les Justificatifs
       </button>
+
     </div>
 
     <!-- PANEL PROMOTIONS -->
     <div *ngIf="activePanel === 'promotions'" class="accordion-panel card p-4 mb-4">
       <h4 class="mb-3">📄 Liste des Promotions</h4>
 
-      <table class="table table-bordered">
-        <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nom</th>
-          <th>Année début</th>
-          <th>Année fin</th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let promo of promotions">
-          <td>{{ promo.id_promotion }}</td>
-          <td>{{ promo.nom }}</td>
-          <td>{{ promo.debut_annee_scolaire }}</td>
-          <td>{{ promo.fin_annee_scolaire }}</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary me-2" (click)="remplirForm(promo)">✏️ Modifier</button>
-            <button class="btn btn-sm btn-outline-danger" (click)="supprimerPromotion(promo.id_promotion)">🗑️ Supprimer</button>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-bordered">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Année début</th>
+            <th>Année fin</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let promo of promotions">
+            <td>{{ promo.id_promotion }}</td>
+            <td>{{ promo.nom }}</td>
+            <td>{{ promo.debut_annee_scolaire }}</td>
+            <td>{{ promo.fin_annee_scolaire }}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary me-2" (click)="remplirForm(promo)">✏️ Modifier</button>
+              <button class="btn btn-sm btn-outline-danger" (click)="supprimerPromotion(promo.id_promotion)">🗑️
+                Supprimer</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
 
       <form (ngSubmit)="soumettreForm()" #promoForm="ngForm" class="mt-4">
         <h5>{{ promoEnEdition ? '✏️ Modifier' : '➕ Ajouter' }} une Promotion</h5>
@@ -70,27 +74,32 @@
     <div *ngIf="activePanel === 'groupes'" class="accordion-panel card p-4 mb-4">
       <h4 class="mb-3">👥 Liste des Groupes</h4>
 
-      <table class="table table-bordered">
-        <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nom</th>
-          <th>Promotion</th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let groupe of groupes">
-          <td>{{ groupe.id_groupe }}</td>
-          <td>{{ groupe.nom }}</td>
-          <td>{{ getNomPromotion(groupe.id_promotion) }}</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary me-2" (click)="remplirFormGroupe(groupe)">✏️ Modifier</button>
-            <button class="btn btn-sm btn-outline-danger" (click)="supprimerGroupe(groupe.id_groupe)">🗑️ Supprimer</button>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-bordered">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Promotion</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let groupe of groupes">
+            <td>{{ groupe.id_groupe }}</td>
+            <td>{{ groupe.nom }}</td>
+            <td>{{ getNomPromotion(groupe.id_promotion) }}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary me-2" (click)="remplirFormGroupe(groupe)">✏️
+                Modifier</button>
+              <button class="btn btn-sm btn-outline-danger" (click)="supprimerGroupe(groupe.id_groupe)">🗑️
+                Supprimer</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+      </div>
 
       <form (ngSubmit)="soumettreFormGroupe()" #groupeForm="ngForm" class="mt-4">
         <h5>{{ groupeEnEdition ? '✏️ Modifier' : '➕ Ajouter' }} un Groupe</h5>
@@ -117,40 +126,43 @@
     <div *ngIf="activePanel === 'etudiants'" class="accordion-panel card p-4 mb-4">
       <h4 class="mb-3">🧑‍🎓 Liste des Étudiants</h4>
 
-      <table class="table table-bordered">
-        <thead>
-        <tr>
-          <th>NEtudiant</th>
-          <th>Nom</th>
-          <th>Prénom</th>
-          <th>Email</th>
-          <th>TD</th>
-          <th>Anglais</th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let etu of etudiants">
-          <td>{{ etu.NEtudiant }}</td>
-          <td>{{ etu.nom }}</td>
-          <td>{{ etu.prenom }}</td>
-          <td>{{ etu.email }}</td>
-          <td>{{ etu.id_groupe_TD }}</td>
-          <td>{{ etu.id_groupe_Anglais }}</td>
-          <td>
-            <button class="btn btn-sm btn-outline-primary me-2" (click)="remplirFormEtudiant(etu)">✏️</button>
-            <button class="btn btn-sm btn-outline-danger" (click)="supprimerEtudiant(etu.NEtudiant)">🗑️</button>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-bordered">
+          <thead>
+          <tr>
+            <th>NEtudiant</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Email</th>
+            <th>TD</th>
+            <th>Anglais</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let etu of etudiants">
+            <td>{{ etu.NEtudiant }}</td>
+            <td>{{ etu.nom }}</td>
+            <td>{{ etu.prenom }}</td>
+            <td>{{ etu.email }}</td>
+            <td>{{ etu.id_groupe_TD }}</td>
+            <td>{{ etu.id_groupe_Anglais }}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary me-2" (click)="remplirFormEtudiant(etu)">✏️</button>
+              <button class="btn btn-sm btn-outline-danger" (click)="supprimerEtudiant(etu.NEtudiant)">🗑️</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
 
       <form (ngSubmit)="soumettreFormEtudiant()" #etuForm="ngForm" class="mt-4">
         <h5>{{ etudiantEnEdition ? '✏️ Modifier' : '➕ Ajouter' }} un Étudiant</h5>
         <div class="row g-3">
           <div class="col-md-4">
             <label class="form-label">NEtudiant</label>
-            <input class="form-control" [(ngModel)]="formEtudiant.NEtudiant" name="netu" [readonly]="etudiantEnEdition" required />
+            <input class="form-control" [(ngModel)]="formEtudiant.NEtudiant" name="netu" [readonly]="etudiantEnEdition"
+                   required />
           </div>
           <div class="col-md-4">
             <label class="form-label">Nom</label>
@@ -166,7 +178,7 @@
           </div>
           <div class="col-md-6">
             <label class="form-label">Mot de passe</label>
-            <input class="form-control" [(ngModel)]="formEtudiant.mot_de_passe" name="mdp"/>
+            <input class="form-control" [(ngModel)]="formEtudiant.mot_de_passe" name="mdp" />
           </div>
           <div class="col-md-6">
             <label class="form-label">Groupe TD</label>
@@ -226,46 +238,49 @@
         </div>
       </form>
       <!-- 📋 Tableau -->
-      <table class="table table-bordered">
-        <thead>
-        <tr>
-          <th>Étudiant</th>
-          <th>Cours</th>
-          <th>Date</th>
-          <th>Fichier</th>
-          <th>Commentaire</th>
-          <th>Statut</th>
-          <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let justif of justificatifs">
-          <td>{{ justif.prenom_etudiant }} {{ justif.nom_etudiant }}</td>
-          <td>{{ justif.nom_cours }}</td>
-          <td>{{ justif.date_heure_debut | date:'short' }}</td>
-          <td>
-            <button class="btn btn-outline-secondary btn-sm" (click)="openJustificatif(justif)">
-              📂 Voir le justificatif
-            </button>
-          </td>
-          <td>
-            <input [(ngModel)]="justif.commentaire_admin" class="form-control" placeholder="Commentaire..." />
-          </td>
-          <td>
-          <span [ngClass]="{
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-bordered">
+          <thead>
+          <tr>
+            <th>Étudiant</th>
+            <th>Cours</th>
+            <th>Date</th>
+            <th>Fichier</th>
+            <th>Commentaire</th>
+            <th>Statut</th>
+            <th>Action</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let justif of justificatifs">
+            <td>{{ justif.prenom_etudiant }} {{ justif.nom_etudiant }}</td>
+            <td>{{ justif.nom_cours }}</td>
+            <td>{{ justif.date_heure_debut | date:'short' }}</td>
+            <td>
+              <a [href]="'http://localhost:3000/uploads/justificatifs/' + justif.fichier_url" target="_blank">📄
+                Voir</a>
+            </td>
+            <td>
+              <input [(ngModel)]="justif.commentaire_admin" class="form-control" placeholder="Commentaire..." />
+            </td>
+            <td>
+                <span [ngClass]="{
               'text-warning': justif.statut === 'en_attente',
               'text-success': justif.statut === 'accepte',
               'text-danger': justif.statut === 'refuse'
             }">{{ justif.statut }}</span>
-          </td>
-          <td>
-            <button class="btn btn-sm btn-success me-2" (click)="traiterJustificatif(justif, 'accepte')">✅</button>
-            <button class="btn btn-sm btn-danger" (click)="traiterJustificatif(justif, 'refuse')">❌</button>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-success me-2" (click)="traiterJustificatif(justif, 'accepte')">✅</button>
+              <button class="btn btn-sm btn-danger" (click)="traiterJustificatif(justif, 'refuse')">❌</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+
+
 
   </div>
 </main>

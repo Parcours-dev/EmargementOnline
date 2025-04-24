@@ -1,29 +1,29 @@
 <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
-        @if (estUtilisateurConnecte) {
-            <!-- Afficher uniquement si connecté & changer nom utilisateur en fonction de la personne identifiée -->
-            <a class="navbar-brand">Bonjour {{ nomUtilisateur }}</a>
-        }
-        <div class="d-flex justify-content-center flex-grow-1">
-            @if (doitAfficherHeaderEtudiant) {
-                <!-- Header Etudiant -->
-                <a class="navbar-brand navbar-link-small">Tableau de bord Etudiant</a>
-            }
-            @if (doitAfficherHeaderCfa) {
-                <!-- Header CFA -->
-                <a class="navbar-brand navbar-link-small">Tableau de bord CFA</a>
-                <a class="navbar-brand navbar-link-small">Rapport des absences</a>
-            }
-            @if (doitAfficherHeaderProfesseur) {
-                <!-- Header Professeur -->
-                <a class="navbar-brand navbar-link-small">Tableau de bord Professeur</a>
-            }
-        </div>
-        @if (estUtilisateurConnecte) {
-            <!-- Afficher uniquement si utilisateur connecté -->
-            <button class="btn btn-white ms-auto deconnexion-btn" (click)="deconnecterUtilisateur()">
-                Déconnexion
-            </button>
-        }
+  <div class="container-fluid">
+    @if (estUtilisateurConnecte) {
+      <!-- Afficher uniquement si connecté & changer nom utilisateur en fonction de la personne identifiée -->
+      <a class="navbar-brand">Bonjour {{ nomUtilisateur }}</a>
+    }
+    <div class="d-flex justify-content-center flex-grow-1">
+      @if (doitAfficherHeaderEtudiant) {
+        <!-- Header Etudiant -->
+        <a class="navbar-brand navbar-link-small" style="cursor: pointer;" (click)="redirigeVerPageDashboardEtudiant()">Tableau de bord Etudiant</a>
+      }
+      @if (doitAfficherHeaderCfa) {
+        <!-- Header CFA -->
+        <a class="navbar-brand navbar-link-small" style="cursor: pointer;" (click)="redirigeVerPageDashboardCfa()">Tableau de bord CFA</a>
+        <a class="navbar-brand navbar-link-small" style="cursor: pointer;" (click)="redirigeVerPageRapportAbsence()">Rapport des absences</a>
+      }
+      @if (doitAfficherHeaderProfesseur) {
+        <!-- Header Professeur -->
+        <a class="navbar-brand navbar-link-small" style="cursor: pointer;" (click)="redirigeVerPageDashboardProfesseur()">Tableau de bord Professeur</a>
+      }
     </div>
+    @if (estUtilisateurConnecte) {
+      <!-- Afficher uniquement si utilisateur connecté -->
+      <button class="btn btn-white ms-auto deconnexion-btn" (click)="deconnecterUtilisateur()">
+        Déconnexion
+      </button>
+    }
+  </div>
 </nav>

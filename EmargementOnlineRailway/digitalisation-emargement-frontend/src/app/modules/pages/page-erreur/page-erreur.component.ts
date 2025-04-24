@@ -12,15 +12,15 @@ import { ACCUEIL } from "../../../shared/constantes/liens.const";
 })
 export class PageErreurComponent {
 
-    private readonly router = inject(Router);
+  private readonly router = inject(Router);
 
-      redirigeUtilisateurVersAccueilEtDeconnecte() {
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('_TOKEN_UTILISATEUR');
-          localStorage.removeItem('_INFOS_UTILISATEUR');
-          localStorage.clear();
-        }
-        this.router.navigateByUrl(`${ACCUEIL}`);
-      }
+  redirigeUtilisateurVersAccueilEtDeconnecte() {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('_TOKEN_UTILISATEUR');
+      localStorage.removeItem('_INFOS_UTILISATEUR');
+      localStorage.clear();
+    }
+    this.router.navigateByUrl(`${ACCUEIL}`);
+  }
 
 }

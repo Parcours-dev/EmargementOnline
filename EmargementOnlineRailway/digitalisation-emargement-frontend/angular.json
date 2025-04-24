@@ -71,14 +71,14 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "digitalisation-emargement-frontend:build"
+            "buildTarget": "digitalisation-emargement-frontend:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "digitalisation-emargement-frontend:build:production"
+              "buildTarget": "digitalisation-emargement-frontend:build:production"
             },
             "development": {
-              "browserTarget": "digitalisation-emargement-frontend:build:development"
+              "buildTarget": "digitalisation-emargement-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { ACCUEIL, DASHBOARD_CFA, DASHBOARD_ETUDIANT, DASHBOARD_PROFESSEUR } from "../../../shared/constantes/liens.const";
+import { ACCUEIL, DASHBOARD_CFA, DASHBOARD_ETUDIANT, DASHBOARD_PROFESSEUR, RAPPORT_ABSENCE } from "../../../shared/constantes/liens.const";
 
 @Component({
   selector: "app-header",
@@ -46,6 +46,9 @@ export class HeaderComponent implements OnInit{
     this.router.navigateByUrl(`${DASHBOARD_PROFESSEUR}`);
   }
 
+  redirigeVerPageRapportAbsence() {
+    this.router.navigateByUrl(`${RAPPORT_ABSENCE}`);
+  }
   private affichageHeader() {
     if (typeof window === 'undefined') return;
     const infosBrutes = localStorage.getItem('_INFOS_UTILISATEUR');
