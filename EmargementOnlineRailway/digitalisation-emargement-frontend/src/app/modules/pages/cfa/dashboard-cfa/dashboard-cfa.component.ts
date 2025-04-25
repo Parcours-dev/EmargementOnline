@@ -13,7 +13,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   styleUrls: ['./dashboard-cfa.component.css']
 })
 export class DashBoardCfaComponent implements OnInit {
-  private readonly API = ' https://emargementonline-production.up.railway.app/api';
+  private readonly API = 'https://emargementonline-production.up.railway.app/api';
   private http = inject(HttpClient);
 
   activePanel: null | "promotions" | "groupes" | "etudiants" | "justificatifs" = null;
@@ -308,4 +308,25 @@ export class DashBoardCfaComponent implements OnInit {
       error: () => console.error('❌ Erreur chargement justificatifs')
     });
   }
+
+
+  openJustificatif(justif: any) {
+    const tokenStorage = localStorage.getItem('_TOKEN_UTILISATEUR');
+    if (!tokenStorage || !justif.fichier_url) return;
+
+    const token = JSON.parse(tokenStorage).token;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    this.http.get(`${this.API}/justificatifs/${justif.fichier_url}`, {
+      headers,
+      responseType: 'blob' // ⚠️ important pour fichier binaire
+    }).subscribe(blob => {
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    }, err => {
+      console.error("❌ Erreur ouverture justificatif :", err);
+      alert("Impossible d’ouvrir le justificatif.");
+    });
+  }
+
 }
