@@ -238,46 +238,45 @@
         </div>
       </form>
       <!-- 📋 Tableau -->
-      <div style="max-height: 400px; overflow-y: auto;">
-        <table class="table table-bordered">
-          <thead>
-          <tr>
-            <th>Étudiant</th>
-            <th>Cours</th>
-            <th>Date</th>
-            <th>Fichier</th>
-            <th>Commentaire</th>
-            <th>Statut</th>
-            <th>Action</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr *ngFor="let justif of justificatifs">
-            <td>{{ justif.prenom_etudiant }} {{ justif.nom_etudiant }}</td>
-            <td>{{ justif.nom_cours }}</td>
-            <td>{{ justif.date_heure_debut | date:'short' }}</td>
-            <td>
-              <a [href]="'http://localhost:3000/uploads/justificatifs/' + justif.fichier_url" target="_blank">📄
-                Voir</a>
-            </td>
-            <td>
-              <input [(ngModel)]="justif.commentaire_admin" class="form-control" placeholder="Commentaire..." />
-            </td>
-            <td>
-                <span [ngClass]="{
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th>Étudiant</th>
+          <th>Cours</th>
+          <th>Date</th>
+          <th>Fichier</th>
+          <th>Commentaire</th>
+          <th>Statut</th>
+          <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let justif of justificatifs">
+          <td>{{ justif.prenom_etudiant }} {{ justif.nom_etudiant }}</td>
+          <td>{{ justif.nom_cours }}</td>
+          <td>{{ justif.date_heure_debut | date:'short' }}</td>
+          <td>
+            <button class="btn btn-outline-secondary btn-sm" (click)="openJustificatif(justif)">
+              📂 Voir le justificatif
+            </button>
+          </td>
+          <td>
+            <input [(ngModel)]="justif.commentaire_admin" class="form-control" placeholder="Commentaire..." />
+          </td>
+          <td>
+          <span [ngClass]="{
               'text-warning': justif.statut === 'en_attente',
               'text-success': justif.statut === 'accepte',
               'text-danger': justif.statut === 'refuse'
             }">{{ justif.statut }}</span>
-            </td>
-            <td>
-              <button class="btn btn-sm btn-success me-2" (click)="traiterJustificatif(justif, 'accepte')">✅</button>
-              <button class="btn btn-sm btn-danger" (click)="traiterJustificatif(justif, 'refuse')">❌</button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-success me-2" (click)="traiterJustificatif(justif, 'accepte')">✅</button>
+            <button class="btn btn-sm btn-danger" (click)="traiterJustificatif(justif, 'refuse')">❌</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
     </div>
 
 
